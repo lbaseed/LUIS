@@ -1,7 +1,11 @@
-<?php ob_start(); 
-//$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
-$_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
+<?php 
 
+    ob_start(); 
+    //$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
+    $_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
+
+    $Config = new Config;
+    $conn = $Config->connect();
 
 function autologout($sec){		
 	if (isset( $_SESSION["ctime"]))
@@ -199,19 +203,27 @@ function panel_foot(){
 	
 //controls functions
 function list_categories(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM 111_categories");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->id;
+            $name = $row->name;
+
+            echo "<option value='$id'>$name || [ $id ]</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_categories");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["id"];  $name = $rec["name"];  
-										 
-											echo "<option value='$id'>$name || [ $id ]</option>";
-
-										}
-									}
+    }
 }
 
 function getCategories($cat_id){

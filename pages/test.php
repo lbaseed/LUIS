@@ -1,15 +1,9 @@
 <?php
 ob_start(); include("../inc/config.php"); include("../inc/php_functions.php"); 
+list_categories();
+?>
 
-echo $currentPage = end(explode('/', $_SERVER['SCRIPT_NAME']));
-
-echo $_SESSION["cur_user"];
-if(checkChangePassword($_SESSION["cur_user"])){
-    echo "Good";
-}
-exit();
-
-if($currentPage !== 'change_password.php' && checkChangePassword($_SESSION["cur_user"]) === true){
-    header('location:change_password.php');
-    exit();
-}
+<select>
+    <option value="">Select Item</option>
+    <?php list_categories(); ?>
+</select>

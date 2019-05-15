@@ -1,17 +1,41 @@
-<?php  session_start();
-	
-	error_reporting(0);
+<?php  
 
-	$db_host = "localhost";
+    session_start();
+	//error_reporting(0);
+
+    $db_host = "localhost";
 	$db_name = "uis";
 	$db_user = "root";
 	$db_pass = "";
 
-	$conn = mysql_connect("$db_host", "$db_user", "$db_pass");
 
-if($conn) {
-	
-	mysql_select_db("$db_name", $conn);
-	
-}
+    class Config{
+        
+        private $_host, 
+                $_dbname, 
+                $_dbuser, 
+                $_dbpass;
+        
+        public function connect(){
+
+            $this->_host = "localhost";
+            $this->_dbname = "uis";
+            $this->_dbuser = "root";
+            $this->_dbpass = "";
+
+            $dsn = "mysql:host=".$this->_host.";dbname=".$this->_dbname;
+            $options = [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ];
+
+            try{
+                $pdo = new PDO($dsn , $this->_dbuser, $this->_dbpass, $options);
+                return $pdo;
+            }
+            catch(PDOException $e){
+                die($e->getMessage());
+                //die("Unable to connect to Remote Server");
+            }
+
+        }
+        
+    }
 ?>
