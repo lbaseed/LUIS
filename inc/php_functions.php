@@ -1,7 +1,11 @@
-<?php ob_start(); 
-//$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
-$_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
+<?php 
 
+    ob_start(); 
+    //$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
+    $_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
+
+    $Config = new Config;
+    $conn = $Config->connect();
 
 function autologout($sec){		
 	if (isset( $_SESSION["ctime"]))
@@ -199,181 +203,272 @@ function panel_foot(){
 	
 //controls functions
 function list_categories(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_categories");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->id;
+            $name = $row->name;
+
+            echo "<option value='$id'>$name || [ $id ]</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_categories");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["id"];  $name = $rec["name"];  
-										 
-											echo "<option value='$id'>$name || [ $id ]</option>";
-
-										}
-									}
+    }
 }
 
 function getCategories($cat_id){
-	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_categories where id='$cat_id'");
-									if (mysql_num_rows($fetch)>0){
 
-										$name = mysql_result($fetch, 0, "name");
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_categories WHERE id = :cat_id ");
+	$stmt->execute(['cat_id' => $cat_id]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        $name = $row->name;
 										 
-										return $name;
-
+        return $name;
 										
-									}
+	}else{
+        return "Error Getting Record";
+    }
+
 }
 
 function list_items(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE status = 1 ORDER BY `name` ASC");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->item_id;
+            $name = $row->name;
+            $sale_price = $row->sale_price;
+
+            echo "<option value='$id'>$name : $sale_price</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_items where status=1 order by `name` ASC");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["item_id"];  $name = $rec["name"];  
-                                            $sale_price = $rec["sale_price"];
-											echo "<option value='$id'>$name : $sale_price</option>";
-
-										}
-									}
+    }
+	
 }
 
 function list_users(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_users ");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->username;
+            $name = $row->fullname;
+
+            echo "<option value='$id'>$name </option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_users ");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["username"];  $name = $rec["fullname"];  
-										 
-											echo "<option value='$id'>$name </option>";
-
-										}
-									}
+    }
+	
 }
 
 function list_customers(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE type='1' ORDER BY `ID` DESC ");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->ID;
+            $name = $row->full_name;
+
+            echo "<option value='$id'>$name [$id]</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_customers where type='1' order by `ID` DESC");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["ID"];  $name = $rec["full_name"];  
-										 
-											echo "<option value='$id'>$name [$id]</option>";
-
-										}
-									}
+    }
+	
 }
 
 function get_customer($id){
-	$name = "";
-	$query = mysql_query("select * from ".$_SESSION["business_id"]."_customers where ID='$id' ");
-	
-		if(mysql_num_rows($query)>0){
-			
-				$rec = mysql_fetch_array($query);
-					
-				$name = $rec["full_name"];
-		}
-	return $name;
-		
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE ID = :id ");
+	$stmt->execute(['id' => $id]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        $name = $row->full_name;
+										 
+        return $name;
+										
+	}else{
+        return "Error Getting Record";
+    }
+
 }
 
 function list_suppliers(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers ORDER BY `ID` DESC ");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->ID;
+            $name = $row->full_name;
+
+            echo "<option value='$id'>$name [$id]</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_suppliers order by `ID` DESC");
-									if (mysql_num_rows($fetch)>0){
+    }
 
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["ID"];  $name = $rec["full_name"];  
-										 
-											echo "<option value='$id'>$name [$id]</option>";
-
-										}
-									}
 }
 
 function get_suppliers($id){
-	$name = "";
-	$query = mysql_query("select * from ".$_SESSION["business_id"]."_suppliers where ID='$id' ");
-	
-		if(mysql_num_rows($query)>0){
-			
-				$rec = mysql_fetch_array($query);
-					
-				$name = $rec["full_name"];
-		}
-	return $name;
-		
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers WHERE ID = :id ");
+	$stmt->execute(['id' => $id]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        $name = $row->full_name;
+										 
+        return $name;
+										
+	}else{
+        return "Error Getting Record";
+    }
+
 }
+
 function get_profit($tid){
-	$profit = 0;
-	$query = mysql_query("select * from ".$_SESSION["business_id"]."_sales where trans_id='$tid' ");
-	
-		if(mysql_num_rows($query)>0){
-			
-				for($i=0; $i<mysql_num_rows($query); $i++){
-					
-					$rec = mysql_fetch_array($query);
-					
-					$cost_price = $rec["cost_price"]; $sold_price = $rec["sold_price"];
-					$qty = $rec["qty"];
-					$profit += ($sold_price - $cost_price) * $qty;
-				}
-		}
-	return $profit;
+    
+    global $conn;
+    $profit = 0;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :tid ");
+	$stmt->execute(['itd' => $tid]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $cost_price = $row->cost_price; 
+        $sold_price = $row->sold_price;
+        $qty = $row->qty;
+        $profit += ($sold_price - $cost_price) * $qty;
+										 
+        return $profit;
+										
+	}else{
+        return "Error Getting Record";
+    }
+
 }
 
 function full_receipt_header(){
 	
-		
-										
-										$business_id = $_SESSION["business_id"];
-                                    $fetch = mysql_query("select * from ".$business_id."_company_profile ");
-                                    
-								if (mysql_num_rows($fetch)>0){
-									
-									$company_name = mysql_result($fetch, 0, "name"); $address = mysql_result($fetch, 0, "address");
-									$phone1 = mysql_result($fetch, 0, "phone1"); $phone2 = mysql_result($fetch, 0, "phone2");
-									$email = mysql_result($fetch, 0, "email");  $logo = mysql_result($fetch, 0, "logo");
-								}
-								?>
-                          			<table>
-                          				<tr>
-                          					<td>
-                          						<div style="text-align: left"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
-                          					</td>
-                          					
-											<td width="600">
-												<div style="text-align: center">
-												<label id="bus_name"><?php echo $company_name?></label><br>
-												<label id="bus_address"><?php echo $address?></label><br>
-												<label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label><br>
-												<label id="bus_email"><?php echo $email?></label>
-												</div>
-											</td>
-                          				</tr>
-                          			</table>
-                          			<div class="clearfix"></div>
-                           			
-                           			
-				<?php
+	global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_company_profile  ");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        $row = $stmt->fetch();
+
+        $company_name = $row->name; 
+        $address = $row->address;
+        $phone1 = $row->phone1; 
+        $phone2 = $row->phone2;
+        $email = $row->email;  
+        $logo = $row->logo;
+    }
+    ?>
+    <table>
+        <tr>
+            <td>
+                <div style="text-align: left"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
+            </td>
+            
+            <td width="600">
+                <div style="text-align: center">
+                <label id="bus_name"><?php echo $company_name?></label><br>
+                <label id="bus_address"><?php echo $address?></label><br>
+                <label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label><br>
+                <label id="bus_email"><?php echo $email?></label>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div class="clearfix"></div>
+        
+    <?php
 }
 
 function logout(){
-	$home_link = $_SESSION["home_link"];
+    $home_link = $_SESSION["home_link"];
+    
 	$_SESSION["cur_user"] = "";
 	$_SESSION["fullName"] = "";
 	$_SESSION["clearance"] = "";
@@ -383,27 +478,44 @@ function logout(){
 }
 
 function getTableData($tbl, $identifier, $parameter, $returnColumn){
-	
-	$query = mysql_query("select * from $tbl where $identifier=$parameter");
-	
-	if(mysql_num_rows($query)>0){
-		
-		$result = mysql_result($query, 0, "$returnColumn");
-		
-		return $result;
-	}
-	
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM $tbl WHERE $identifier = :parameter ");
+	$stmt->execute(['parameter' => $parameter]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $result = $row->$returnColumn; 
+										 
+        return $result;
+										
+	}else{
+        return "Error Getting Record";
+    }
+
 }
 
 function login($sys_user, $pass, $bid)	{
-        
-   
-		$q = mysql_query("SELECT * FROM " . $bid ."_users WHERE username='$sys_user' and active_status='active' ");
-    if($q){
 
-		if (@mysql_num_rows($q)>0)
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM " . $bid ."_users WHERE username= :sys_user AND active_status='active' ");
+	$query = $stmt->execute(['sys_user' => $sys_user]);
+        
+    if($query){
+
+        $rows = $stmt->rowCount();
+        $row = $stmt->fetch();
+
+		if ($rows > 0)
 		{
-            $fpass = mysql_result($q, 0, "password");
+            $fpass = $row->password;
             //$status = mysql_result($q, 0, "status");
 			
 			if ($pass==$fpass)
@@ -414,9 +526,9 @@ function login($sys_user, $pass, $bid)	{
                // }
 				//login successful
 				
-				$_SESSION["cur_user"] = mysql_result($q, 0, "username");
-				$_SESSION["clearance"] = mysql_result($q, 0, "clrs");
-				$_SESSION["fullname"] = mysql_result($q, 0, "fullname");
+				$_SESSION["cur_user"] = $row->username;
+				$_SESSION["clearance"] = $row->clrs;
+				$_SESSION["fullname"] = $row->fullname;
 				$_SESSION["business_id"] = $bid;
 				
 				header("Location:index.php"); 
@@ -707,65 +819,78 @@ function general_order_receipt(){
 function general_thermal_receipt(){
 
     ?>
-             <!-- Small Size -->
-             <div class="modal fade" id="smallModal" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-sm" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="smallModalLabel">Thermal Receipt</h4>
+    <!-- Small Size -->
+    <div class="modal fade" id="smallModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h4 class="modal-title" id="smallModalLabel">Thermal Receipt</h4>
+            </div>
+            <div class="modal-body">
+                <div id="printThis" style="font-size:12px">
+                    <?php
+
+                        global $conn;
+
+                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_company_profile ");
+                        $stmt->execute();
+
+                        $rows = $stmt->rowCount();
+                        
+                        if ($rows>0)
+                        {
+                            
+                            $row = $stmt->fetch();
+                            
+                            $company_name = $row->name;
+                            $address = $row->address;
+                            $phone1 = $row->phone1; 
+                            $phone2 = $row->phone2;
+                            $email = $row->email;  
+                            $logo = $row->logo;
+                                                            
+                        }
+                        
+                    ?>
+                        <div style="text-align: center"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
+                        <div style="text-align: center;">
+                            <label id="bus_name"><?php echo $company_name?></label><br>
+                            <label id="bus_address"><?php echo $address?></label><br>
+                            <label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label>
                         </div>
-                        <div class="modal-body">
-                           	<div id="printThis" style="font-size:12px">
-                          			<?php
-										
-										$business_id = $_SESSION["business_id"];
-									$fetch = mysql_query("select * from ".$business_id."_company_profile ");
-								if (mysql_num_rows($fetch)>0){
-									
-									$company_name = mysql_result($fetch, 0, "name"); $address = mysql_result($fetch, 0, "address");
-									$phone1 = mysql_result($fetch, 0, "phone1"); $phone2 = mysql_result($fetch, 0, "phone2");
-									$email = mysql_result($fetch, 0, "email");  $logo = mysql_result($fetch, 0, "logo");
-								}
-								?>
-                           			<div style="text-align: center"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
-                           			<div style="text-align: center;">
-										<label id="bus_name"><?php echo $company_name?></label><br>
-										<label id="bus_address"><?php echo $address?></label><br>
-										<label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label>
-									</div>
-                           			<div style="float: left">Ref: <label  id="modal_trans_ref"></label></div> 
-                           			<div class="pull-right" ><label id="modal_trans_date"></label></div><br>
-                           			
-									
-                           				<table id="modal_items_list" class="table" >
-                           				<thead>
-                           					<tr><th>Qty</th> <th>Item</th> <th width="25%">Sub</th></tr>
-                           					
-                           					</thead>
-                           					<tbody>
-                           						
-                           					</tbody>
-                           				</table>
-                           			
-                           			<div style="text-align: center">
-										<label>Total Sales: </label> <label id="modal_total_label"> #### </label><br>
-										<label>Amount Tendered: </label> <label id="modal_amount_tendered"> ####</label><br>
-										<label>Change: </label> <label id="modal_change"> ####</label>
-										
-									</div>
-                          			<div><label id="modal_footer">cashier: <?php echo $_SESSION["cur_user"];?>,</label><label id="modal_footer_date"> </label></div>
-                           	</div>
+                        <div style="float: left">Ref: <label  id="modal_trans_ref"></label></div> 
+                        <div class="pull-right" ><label id="modal_trans_date"></label></div><br>
+                        
+                        
+                            <table id="modal_items_list" class="table" >
+                            <thead>
+                                <tr><th>Qty</th> <th>Item</th> <th width="25%">Sub</th></tr>
+                                
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        
+                        <div style="text-align: center">
+                            <label>Total Sales: </label> <label id="modal_total_label"> #### </label><br>
+                            <label>Amount Tendered: </label> <label id="modal_amount_tendered"> ####</label><br>
+                            <label>Change: </label> <label id="modal_change"> ####</label>
+                            
                         </div>
-                        <div class="modal-footer">
-                           	
-                            <button type="button" class="btn btn-link waves-effect" onClick="printDiv('printThis')">Print Receipt</button>
-                            <button type="button" class="btn btn-link waves-effect" id="modal_close" data-dismiss="modal">CLOSE</button>
-                        </div>
-                    </div>
+                        <div><label id="modal_footer">cashier: <?php echo $_SESSION["cur_user"];?>,</label><label id="modal_footer_date"> </label></div>
                 </div>
             </div>
-            
-            <!-- ======  end of small modal ========-->
+            <div class="modal-footer">
+                
+                <button type="button" class="btn btn-link waves-effect" onClick="printDiv('printThis')">Print Receipt</button>
+                <button type="button" class="btn btn-link waves-effect" id="modal_close" data-dismiss="modal">CLOSE</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======  end of small modal ========-->
             
     <?php
 }
@@ -781,20 +906,31 @@ function deposite_payback_receipt(){
                         <div class="modal-body">
                            	<div id="printThis" style="font-size:12px">
                           			<?php
-										
-										$business_id = $_SESSION["business_id"];
-									$fetch = mysql_query("select * from ".$business_id."_company_profile ");
-								if (mysql_num_rows($fetch)>0){
-									
-									$company_name = mysql_result($fetch, 0, "name"); $address = mysql_result($fetch, 0, "address");
-									$phone1 = mysql_result($fetch, 0, "phone1"); $phone2 = mysql_result($fetch, 0, "phone2");
-									$email = mysql_result($fetch, 0, "email");  $logo = mysql_result($fetch, 0, "logo");
-								}
+                                        global $conn;
+
+                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_company_profile ");
+                                        $stmt->execute();
+                
+                                        $rows = $stmt->rowCount();
+                                        
+                                        if ($rows>0)
+                                        {
+                                            
+                                            $row = $stmt->fetch();
+                                            
+                                            $company_name = $row->name;
+                                            $address = $row->address;
+                                            $phone1 = $row->phone1; 
+                                            $phone2 = $row->phone2;
+                                            $email = $row->email;  
+                                            $logo = $row->logo;
+                                                                            
+                                        }
 								?>
                            			<div style="text-align: center"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
                            			<div style="text-align: center;">
-										<label id="bus_name"><?php echo $company_name?></label><br>
-										<label id="bus_address"><?php echo $address?></label><br>
+										<label id="bus_name"><?php echo $company_name; ?></label><br>
+										<label id="bus_address"><?php echo $address; ?></label><br>
 										<label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label>
 									</div>
                            			<div style="float: left">Ref: <label  id="modal_depo_ref"></label></div> 
@@ -840,103 +976,130 @@ function message($type, $bg, $text){
 }
 
 function dailySales(){
-	
-	$today = date("Y-m-d");
-	
-		$query = mysql_query("select * from ".$_SESSION["business_id"]."_st_sales where date='$today'");
+
+    $today = date("Y-m-d");
 	$sales = 0;
-		if(@mysql_num_rows($query)>0){
-			$sales = mysql_result($query, 0, "amount");
-			
-		}
-	return $sales;
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_st_sales WHERE date = :today ");
+    $stmt->execute(['today' => $today]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $sales = $row->amount;
+        return $sales;
+                                        
+    }else {
+        return "Error Getting Record";
+    }
+	
 }
 
 function dailyQty(){
 	
-	$today = date("Y-m-d");
-	
-		$query = mysql_query("select * from ".$_SESSION["business_id"]."_st_sales where date='$today'");
-	$qty = 0;
-		if(@mysql_num_rows($query)>0){
-			$qty = mysql_result($query, 0, "qty");
-			
-		}
-	return $qty;
+    $today = date("Y-m-d");
+    $qty = 0;
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_st_sales WHERE date = :today ");
+    $stmt->execute(['today' => $today]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $qty = $row->qty;
+        return $qty;
+                                        
+    }else {
+        return "Error Getting Record";
+    }
 	
 }
 
 function monthlySales(){
 	
-	$year = date("Y"); $month = date("m");
-	
-		$query = mysql_query("select * from ".$_SESSION["business_id"]."_st_sales where MONTH(date)='$month' and YEAR(date)='$year'");
-	
-	$totalSales = 0;
-	
-		if(mysql_num_rows($query)>0){
-			
-			for ($i=0; $i<mysql_num_rows($query); $i++){
-				
-				$sales = mysql_result($query, $i, "amount");
-			}
-			
-			$totalSales+=$sales;
-			
-		}else {$totalSales = 0;}
+    $year = date("Y"); 
+    $month = date("m");
+    $totalSales = 0;
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_st_sales WHERE MONTH(date)= :month AND YEAR(date)= :year");
+    $stmt->execute(['month' => $month, 'year' => $year]);
+
+    $rows = $stmt->rowCount();
+    //BUG Discuss with CEO bekamata $totalSales nachikin for loop ba kamar yadda yake da a nasa
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+            $sales = $row->amount;
+            
+            $totalSales+=$sales;
+        }
+        
+    }else {
+        $totalSales = 0;
+    }
 	
 	return $totalSales;
 }
 
 function totalItems(){
 	
-	
-		$query = mysql_query("select * from ".$_SESSION["business_id"]."_items ");
-	
+	global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items ");
+    $stmt->execute();
+
+    $rows = $stmt->rowCount();
 		
-	return mysql_num_rows($query);
+	return $rows;
 	
 }
 
-
-function getLastBusinessID(){
-	
-    $query = mysql_query("SELECT * FROM system_mst");
-
-    if (mysql_num_rows($query) > 0){
-
-        $row = mysql_fetch_array($query);
-
-        $last_business_id = $row["last_business_id"];
-        $new_business_id = $last_business_id + 1;
-
-        mysql_query("UPDATE system_mst SET last_business_id = '$new_business_id'");
-        return $last_business_id;
-
-    }
-}
 
 function getTotalSalesType($type, $date1, $date2){
 
     $total = 0;
-    $bid = $_SESSION["business_id"]; 
-    $q = mysql_query("select * from ".$bid."_payment_analysis where date between '$date1' and '$date2' and status <> 'returned'");
+    global $conn;
 
-    if(mysql_num_rows($q)>0){
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE date BETWEEN :date1 AND :date2 AND status <> 'returned' ");
+    $stmt->execute(['date1' => $date1, 'date2' => $date2]);
 
-            while($row = mysql_fetch_array($q)){
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        while($row = $stmt->fetch()){
 
-                switch ($type){
+            switch ($type){
 
-                    case 1: $total += $row["cash"]; break;
-                    case 2: $total += $row["pos"]; break;
-                    case 3: $total += $row["transfer"]; break;
-                    case 4: $total += $row["amount"]; break;
+                case 1: 
+                    $total += $row->cash; 
+                break;
+                case 2: 
+                    $total += $row->pos;
+                break;
+                case 3: 
+                    $total += $row->transfer; 
+                break;
+                case 4: 
+                    $total += $row->amount; 
+                break;
 
-                }
-                
             }
 
+        }
     }
 
     return $total;

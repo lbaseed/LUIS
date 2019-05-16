@@ -78,6 +78,7 @@ protectPage(9);
         <div class="container-fluid">
             
             <!-- Input -->
+            <!-- @Kolerian Todo -->
             <div class="row clearfix">
             
             	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">

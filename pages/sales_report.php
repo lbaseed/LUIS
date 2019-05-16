@@ -196,48 +196,130 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                     <tbody>
                                         
                                         <?php
+									//@Kolerian Todo		
+									// 	if(isset($_GET["submit"])){
 											
-										if(isset($_GET["submit"])){
+									// 		//search sales record
+									// 		$user = sanitize($_GET["user"]);
+									// 		$dt = split(":",sanitize($_GET["date"]));
 											
-											//search sales record
-											$user = sanitize($_GET["user"]);
-											$dt = split(":",sanitize($_GET["date"]));
-											
-								        if ($user and $dt){
+								    //     if ($user and $dt){
 									
 								
-											$dt1 = trim($dt[0]);  
-											$dt2 = trim($dt[1]);
-											$grand_total = 0;
-											$total_profit = 0;
-										if($user=="ALL"){ 
-											$get_records = mysql_query("select * from ".$_SESSION["business_id"]."_trans where date BETWEEN '$dt1' AND '$dt2' order by `date` DESC");
-										} else {
+									// 		$dt1 = trim($dt[0]);  
+									// 		$dt2 = trim($dt[1]);
+									// 		$grand_total = 0;
+									// 		$total_profit = 0;
+									// 	if($user=="ALL"){ 
+									// 		$get_records = mysql_query("select * from ".$_SESSION["business_id"]."_trans where date BETWEEN '$dt1' AND '$dt2' order by `date` DESC");
+									// 	} else {
 											
-											$get_records = mysql_query("select * from ".$_SESSION["business_id"]."_trans where cashier='$user' and date BETWEEN '$dt1' AND '$dt2' order by `date` DESC");
-                                        }	
+									// 		$get_records = mysql_query("select * from ".$_SESSION["business_id"]."_trans where cashier='$user' and date BETWEEN '$dt1' AND '$dt2' order by `date` DESC");
+                                    //     }	
                                         
 											
                                             
                                         
-											if(mysql_num_rows($get_records)>0){
-												$sn = 1; 
-												for($i=0; $i<mysql_num_rows($get_records); $i++){
-													$rec = mysql_fetch_array($get_records);
+									// 		if(mysql_num_rows($get_records)>0){
+									// 			$sn = 1; 
+									// 			for($i=0; $i<mysql_num_rows($get_records); $i++){
+									// 				$rec = mysql_fetch_array($get_records);
 													
-													$tid = $rec["tid"]; $total_sales = $rec["total_sales"];
-													$cid = $rec["cid"];
-													if ($cid>0){ $type = get_customer($cid);  } else { $type = "Walk in Customer"; }
+									// 				$tid = $rec["tid"]; $total_sales = $rec["total_sales"];
+									// 				$cid = $rec["cid"];
+									// 				if ($cid>0){ $type = get_customer($cid);  } else { $type = "Walk in Customer"; }
 													
-													$date = $rec["date"];
+									// 				$date = $rec["date"];
+									// 				$cashier = $rec["cashier"]; 
+									// 				$profit = get_profit($tid);
+													
+									// 				//summation of total sales and profit
+									// 				$grand_total +=$total_sales;
+									// 				$total_profit += $profit;
+													
+									// 				echo "<tr>
+									// 						<td>$sn</td>
+									// 						<td> <a href=''>$tid</a> </td>
+															
+									// 						<td>$type</td>
+									// 						<td>". number_format($total_sales)."</td>
+									// 						<td>".number_format($profit)."</td>
+									// 						<td>$date</td>
+									// 						<td>$cashier</td>
+									// 						<td> <button type='button' class='btn bg-default waves-effect' onClick='full_receipt($tid, $cid)'> 
+									// 						<i class='material-icons'>assignment</i>
+									// 						</button> </td>
+									// 						</tr>
+									// 				";
+									// 				$sn+=1;
+									// 			}
+									// 			echo "<tr>
+									// 						<td> </td>
+									// 						<td>  </td>
+															
+									// 						<td align='right'> <b>Total: </td>
+									// 						<td> <b>". number_format($grand_total)."</b></td>
+									// 						<td> <b>".number_format($total_profit)." </b></td>
+									// 						<td> </td>
+									// 						<td> </td>
+									// 						<td> </td>
+									// 			</tr>";
+												
+									// 		}else{ echo "<div class='alert alert-danger'>No Record Found</div>";}
+											
+									// }		
+											
+                                    //     }
+
+                                    if(isset($_POST["submit"]))
+                                    {
+                                        //search sales record
+                                        $user = sanitize($_GET["user"]);
+                                        $dt = split(":",sanitize($_GET["date"]));
+
+                                        if($user and $dt)
+                                        {
+                                            $dt1 = trim($dt[0]);  
+											$dt2 = trim($dt[1]);
+											$grand_total = 0;
+                                            $total_profit = 0;
+                                            
+                                            if($user=="ALL")
+                                            {
+                                                $statement = $conn->prepare("select * from ".$_SESSION["business_id"]."_trans where date BETWEEN ? AND ? order by `date` DESC");
+                                                $statement->execute([
+                                                    $dt1,$dt2
+                                                ]);
+                                            }
+                                            else
+                                            {
+                                                $statement = $conn->prepare("select * from ".$_SESSION["business_id"]."_trans where cashier=? and date BETWEEN ? AND ? order by `date` DESC");
+                                                $statement->execute([
+                                                    $user,$dt1,$dt2  
+                                                ]);
+                                            }
+                                            $rows_count = $statement->rowCount();
+                                            if($rows_count > 0)
+                                            {
+                                                $sn = 1;
+                                                
+                                                for ($i=0; $i < $rows_count ; $i++) 
+                                                { 
+                                                    $rec = $statement->fetch();
+													
+													$tid = $rec->tid; $total_sales = $rec->total_sales;
+                                                    $cid = $rec->cid;
+                                                    if ($cid>0){ $type = get_customer($cid);  } else { $type = "Walk in Customer"; }
+
+                                                    $date = $rec["date"];
 													$cashier = $rec["cashier"]; 
 													$profit = get_profit($tid);
 													
 													//summation of total sales and profit
 													$grand_total +=$total_sales;
-													$total_profit += $profit;
-													
-													echo "<tr>
+                                                    $total_profit += $profit;
+                                                    
+                                                    echo "<tr>
 															<td>$sn</td>
 															<td> <a href=''>$tid</a> </td>
 															
@@ -252,8 +334,8 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 															</tr>
 													";
 													$sn+=1;
-												}
-												echo "<tr>
+                                                }
+                                                echo "<tr>
 															<td> </td>
 															<td>  </td>
 															
@@ -264,12 +346,15 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 															<td> </td>
 															<td> </td>
 												</tr>";
-												
-											}else{ echo "<div class='alert alert-danger'>No Record Found</div>";}
-											
-									}		
-											
-										}
+                                            }
+                                            else
+                                            {
+                                                echo "<div class='alert alert-danger'>No Record Found</div>";
+                                            }
+                                        }
+
+                                    }
+                                        
 										
 										?>
                                     </tbody>

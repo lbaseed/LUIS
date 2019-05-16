@@ -1,21 +1,47 @@
 <?php ob_start(); include("../inc/config.php"); include("../inc/php_functions.php");   //if ($_SESSION["cur_user"]!="") {} else {logout();} 
-if(isset($_POST["post"])){
+
+// if(isset($_POST["post"])){ @Kolerian Todo
 						
-    $customer_name = mysql_real_escape_string($_POST["customer_name"]);
-    $business_name = mysql_real_escape_string($_POST["business_name"]);
-    $email = mysql_real_escape_string($_POST["email"]);
-    $password = mysql_real_escape_string($_POST["password"]);
-    $confirm_pass = mysql_real_escape_string($_POST["confirmPass"]);
-    $agree = mysql_real_escape_string($_POST["terms"]);
+//     $customer_name = mysql_real_escape_string($_POST["customer_name"]);
+//     $business_name = mysql_real_escape_string($_POST["business_name"]);
+//     $email = mysql_real_escape_string($_POST["email"]);
+//     $password = mysql_real_escape_string($_POST["password"]);
+//     $confirm_pass = mysql_real_escape_string($_POST["confirmPass"]);
+//     $agree = mysql_real_escape_string($_POST["terms"]);
     
-    if($agree){
-        $query = mysql_query("insert into VALUES('', '$customer_name','','','', '$password','$business_name')");
+//     if($agree){
+//         $query = mysql_query("insert into VALUES('', '$customer_name','','','', '$password','$business_name')");
 									
 									
-									if ($query) { $success = "<div class='alert alert-success' role='alert'>Customer Added Successfully</div>"; }
-									else { $error = "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}
-	} 
+//             if ($query) { $success = "<div class='alert alert-success' role='alert'>Customer Added Successfully</div>"; }
+//             else { $error = "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}
+// 	} 
+// }
+
+if(isset($_POST["post"]))
+{
+    $customer_name = $_POST["customer_name"];
+    $business_name = $_POST["business_name"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    $confirm_pass = $_POST["confirmPass"];
+    $agree = $_POST["terms"];
+
+    if($agree)
+    {
+        $stmt = $conn->prepare("insert into VALUES('', '$customer_name','','','', '$password','$business_name')");
+        $stmt->execute();
+        if ($query) 
+        {
+            $success = "<div class='alert alert-success' role='alert'>Customer Added Successfully</div>";
+        }
+        else 
+            { 
+                $error = "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";
+            }
+    }
 }
+
 ?>
 <!DOCTYPE html>
 <html>

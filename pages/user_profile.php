@@ -68,45 +68,88 @@ protectPage(3);
                             
                                     </div>
                         <div class="body">
-                        <?php   
+                    <?php   
 
-                        $username = $_SESSION["cur_user"];
-                        $bid = $_SESSION["business_id"];
+                    //     $username = $_SESSION["cur_user"];
+                    //     $bid = $_SESSION["business_id"];
 
-                    //update query
+                    // //update query
 
-                    if(isset($_POST["update"])){
+                    // if(isset($_POST["update"])){
                         
-                        $update_phone = mysql_real_escape_string($_POST["new_phone"]);
-                        $update_address = mysql_real_escape_string($_POST["new_address"]);
-                        $update_email = mysql_real_escape_string($_POST["new_emai"]);
-                        $update_sec_que = mysql_real_escape_string($_POST["security_question"]);
-                        $update_sec_ans = mysql_real_escape_string($_POST["security_answer"]);
+                    //     $update_phone = mysql_real_escape_string($_POST["new_phone"]);
+                    //     $update_address = mysql_real_escape_string($_POST["new_address"]);
+                    //     $update_email = mysql_real_escape_string($_POST["new_emai"]);
+                    //     $update_sec_que = mysql_real_escape_string($_POST["security_question"]);
+                    //     $update_sec_ans = mysql_real_escape_string($_POST["security_answer"]);
 
                         
-                        $update_query = mysql_query("update ".$bid."_users set phone='$update_phone', address='$update_address', email='$update_email' where username='$username' ");
+                    //     $update_query = mysql_query("update ".$bid."_users set phone='$update_phone', address='$update_address', email='$update_email' where username='$username' ");
 
-                        if($update_sec_que) {
-                            $update_sec_query = mysql_query("update ".$bid."_users set security_question='$update_sec_que', security_answer='$update_sec_ans' where username='$username' ");
+                    //     if($update_sec_que) {
+                    //         $update_sec_query = mysql_query("update ".$bid."_users set security_question='$update_sec_que', security_answer='$update_sec_ans' where username='$username' ");
 
-                        }
+                    //     }
 
-                        if($update_query) {echo "<div class='alert alert-success'>Update Successfull</div>";}
-                        else {echo "<div class='alert alert-danger'>Update Failed</div>";}
-                    }
+                    //     if($update_query) {echo "<div class='alert alert-success'>Update Successfull</div>";}
+                    //     else {echo "<div class='alert alert-danger'>Update Failed</div>";}
+                    // }
 
                     
-                    $query = mysql_query("select * from ".$bid."_users where username='$username'");                     
-                        if(mysql_num_rows($query)>0){
-                            $rec = mysql_fetch_array($query);
-                            $username = $rec["username"];
-                            $fullname = $rec["fullname"];
-                            $address = $rec["address"];
-                            $phone = $rec["phone"];
-                            $email = $rec["email"];
-                            $security_question = $rec["security_question"];
-                            $security_answer = $rec["security_answer"];
+                    // $query = mysql_query("select * from ".$bid."_users where username='$username'");                     
+                    //     if(mysql_num_rows($query)>0){
+                    //         $rec = mysql_fetch_array($query);
+                    //         $username = $rec["username"];
+                    //         $fullname = $rec["fullname"];
+                    //         $address = $rec["address"];
+                    //         $phone = $rec["phone"];
+                    //         $email = $rec["email"];
+                    //         $security_question = $rec["security_question"];
+                    //         $security_answer = $rec["security_answer"];
+                    //     }
+
+                    $username = $_SESSION["cur_user"];
+                    $bid = $_SESSION["business_id"];
+
+                    if(isset($_POST["update"]))
+                    {
+                        $update_phone = $_POST["new_phone"];
+                        $update_address = $_POST["new_address"];
+                        $update_email = $_POST["new_emai"];
+                        $update_sec_que = $_POST["security_question"];
+                        $update_sec_ans = $_POST["security_answer"];
+
+                        $statement = $conn->prepare("update ".$bid."_users set phone=?, address=?, email=? where username=?");
+                        $statement->execute([
+                            $update_phone,$update_address,$update_email,$username 
+                        ]);
+
+                        if($update_sec_que)
+                        {
+                            echo "<div class='alert alert-success'>Update Successfull</div>";
                         }
+                        else
+                        {
+                            echo "<div class='alert alert-danger'>Update Failed</div>";
+                        }
+                    }
+
+                    $statement = $conn->prepare("select * from ".$bid."_users where username=?");
+                    $statement->execute([$username]);
+
+                    $row_count = $statement->rowCount();
+                    if($row_count > 0)
+                    {
+                        $rec = $statement->fetch();
+                        $username = $rec->username;
+                        $fullname = $rec->fullname;
+                        $address = $rec->address;
+                        $phone = $rec->phone;
+                        $email = $rec->email;
+                        $security_question = $rec->security_question;
+                        $security_answer = $rec->security_answer;
+                    }
+
                     ?>  							         
                 	<form action="" method="post">
                     
