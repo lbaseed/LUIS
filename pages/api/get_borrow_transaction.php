@@ -27,7 +27,7 @@
 			
 		}
 
-		$stmt2 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_borrow_trans WHERE trans_id = :tid ");
+		$stmt2 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_borrow_trans WHERE tid = :tid ");
 		$stmt2->execute(['tid' => $tid]);
 		
 		while($row2 = $stmt2->fetch(PDO::FETCH_ASSOC)){
