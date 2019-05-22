@@ -85,10 +85,13 @@ protectPage(9);
                                 $recover_status = "yes";
                                 
 								if($fullName and $level){
+
+									$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_users (username, fullname, phone, email, address, password, active_status, recover_password, clrs, security_question, security_answer) VALUES (:username, :fullname, :phone, :email, :address, :password, :active_status, :recover_password, :clrs, :security_question, :security_answer) ");
+				                    $query = $stmt->execute(['username' => "", 'fullname' => $fullName, 'phone' => $phone, 'email' => $email, 'address' => $address, 'password' => "pass", 'active_status' => $active_status, 'recover_password' => $recover_status, 'clrs' => $level, 'security_question' => "", 'security_answer' => "" ]);
+				
+									$user_id  = $conn->lastInsertId();
                                     
-									$q = mysql_query("insert into ".$business_id."_users values('','$fullName','$phone','$email','$address','pass','$active_status','$recover_status','$level','','')");
-									$user_id = mysql_insert_id();
-									if($q){ echo "<div class='alert alert-success'>User Created Successfully. User ID: [$user_id] </div>";}
+									if($query){ echo "<div class='alert alert-success'>User Created Successfully. User ID: [$user_id] </div>";}
 								}
 								else {
 									echo "<div class='alert alert-danger'>Fill all Necessary fields please</div>";
@@ -181,44 +184,50 @@ protectPage(9);
                         			</tr>
                         		</thead>
                         		<tbody>
-                        				
-                        				<?php 
+								<?php 
 								
-							$query = mysql_query("select * from ".$business_id."_users ");
-							if (mysql_num_rows($query)>0){
-								$sn=1;
-								for($i=0; $i<mysql_num_rows($query); $i++){
-									
-									$rec = mysql_fetch_array($query);
-									
-									$username = $rec["username"];  $fullname = $rec["fullname"];  $address = $rec["address"]; $phone = $rec["phone"];
-									$access_lvl = $rec["clrs"];
-																		
-									
-														switch ($access_lvl){
-															case 3:
-																$access = "Sales User";
-																break;
-															case 9:
-																$access = "System Admin";
-																break;
-															case 7:
-																$access = "Manager";
-																break;
-															case 4:
-																$access = "Store User";
-																break;
-															case 5:
-																$access = "Sales Manager";
-																break;
-															case 6: 
-																$access = "Store Manager";
-																break;
-														}
-									echo "<tr><td>$sn</td> <td>$username</td>  <td>$fullname</td>  <td>$address</td>  <td>$phone</td> <td>$access</td></tr>";
-									$sn+=1;
-								}
-							}
+									$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."users ");
+									$stmt->execute();
+		
+									$rows = $stmt->rowCount();
+
+									if ($rows>0){
+										$sn=1;
+
+										for($i=0; $i<$rows; $i++){
+											
+											$row = $stmt->fetch();
+											
+											$username = $row->username; 
+											$fullname = $row->fullname;  
+											$address = $row->address; 
+											$phone = $row->phone;
+											$access_lvl = $row->clrs;
+																				
+											switch ($access_lvl){
+												case 3:
+													$access = "Sales User";
+													break;
+												case 9:
+													$access = "System Admin";
+													break;
+												case 7:
+													$access = "Manager";
+													break;
+												case 4:
+													$access = "Store User";
+													break;
+												case 5:
+													$access = "Sales Manager";
+													break;
+												case 6: 
+													$access = "Store Manager";
+													break;
+											}
+											echo "<tr><td>$sn</td> <td>$username</td>  <td>$fullname</td>  <td>$address</td>  <td>$phone</td> <td>$access</td></tr>";
+											$sn+=1;
+										}
+									}
 							
 							
 							?>

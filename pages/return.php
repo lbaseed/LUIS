@@ -138,19 +138,26 @@ protectPage(7);
 
                             $transaction_id = sanitize($_POST['transaction_id']);
 
-                            $query = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE tid = '$transaction_id' ");
-                            $query1 = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = '$transaction_id' ");
+                            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE tid = :transaction_id ");
+                            $stmt->execute(['transaction_id' => $transaction_id]);
 
-                            if (mysql_num_rows($query)>0 && mysql_num_rows($query1)>0){
+                            $rows = $stmt->rowCount();
 
-                                    $row = mysql_fetch_array($query);
+                            $stmt1 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :transaction_id ");
+                            $stmt1->execute(['transaction_id' => $transaction_id]);
 
-                                    $trans_id = $row["tid"];
-                                    $amount = $row["amount"];
-                                    $cash_amount = $row["cash"];
-                                    $pos_amount = $row["pos"];
-                                    $transfer_amount = $row["transfer"];
-                                    $balance = $row["balance"];
+                            $rows1 = $stmt1->rowCount();
+
+                            if (($rows > 0) && ($rows1>0)){
+
+                                    $row = $stmt->fetch();
+
+                                    $trans_id = $row->tid;
+                                    $amount = $row->amount;
+                                    $cash_amount = $row->cash;
+                                    $pos_amount = $row->pos;
+                                    $transfer_amount = $row->transfer;
+                                    $balance = $row->balance;
                     
                     
                             }else {
@@ -185,23 +192,26 @@ protectPage(7);
 
                                             if (isset($_POST['submit'])) {
 
-                                            $query2 = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = '$transaction_id' ");
+                                                $stmt2 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :transaction_id ");
+                                                $stmt2->execute(['transaction_id' => $transaction_id]);
 
-                                            if (mysql_num_rows($query2)>0){
+                                                $rows2 = $stmt2->rowCount();
 
-                                                while($row = mysql_fetch_array($query2)){
+                                                if ($rows2>0){
 
-                                                    $item_id = $row["item_id"];
-                                                    $item_name = getTableData("111_items", "item_id", "$item_id", "name");
-                                                    $sold_price = $row["sold_price"];
-                                                    $quantity = $row["qty"];
-                                                    $date = $row["date"];
-                                                    
-                                                    echo "<tr><td>$item_name</td><td>$sold_price</td><td>$quantity</td><td>$date</td></tr>";
+                                                    while($row2 = $stmt2->fetch()){
+
+                                                        $item_id = $row2->item_id;
+                                                        $item_name = getTableData("111_items", "item_id", "$item_id", "name");
+                                                        $sold_price = $row2->sold_price;
+                                                        $quantity = $row->qty;
+                                                        $date = $row->date;
+                                                        
+                                                        echo "<tr><td>$item_name</td><td>$sold_price</td><td>$quantity</td><td>$date</td></tr>";
+                                                    }
+                                        
                                                 }
-                                    
                                             }
-                                        }
                                         ?>
                                     </tr>
                                 </table>
@@ -254,15 +264,25 @@ protectPage(7);
                                     if(!empty($trans_id) && !empty($reason)){
 
                                         //Used to check if valid trans_id because trans_id is from hidden field and user can alter the value
-                                        $check = mysql_num_rows(mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE tid = '$trans_id' "));
-                                        $check1 = mysql_num_rows(mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = '$trans_id' "));
-                                        
+                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE tid = :trans_id ");
+                                        $stmt->execute(['tans_id' => $trans_id]);
+
+                                        $rows = $stmt->rowCount();
+
+                                        $stmt1 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :trans_id ");
+                                        $stmt1->execute(['tans_id' => $trans_id]);
+
+                                        $rows1 = $stmt1->rowCount();
+
                                         //Used to check if transaction return already initialized
-                                        $check2 = mysql_num_rows(mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_return WHERE trans_id = '$trans_id' "));
+                                        $stmt2 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_return WHERE trans_id = :trans_id ");
+                                        $stmt2->execute(['tans_id' => $trans_id]);
 
-                                        if ($check > 0 && $check1 > 0) {
+                                        $rows2 = $stmt2->rowCount();
 
-                                            if ($check2 == 0) {
+                                        if ($rows > 0 && $rows1 > 0) {
+
+                                            if ($rows2 == 0) {
                                                 
                                                 if(insertReturn($trans_id,$reason)){
 

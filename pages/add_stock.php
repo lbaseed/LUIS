@@ -82,12 +82,15 @@ protectPage(6);
 									$date = date("Y-m-d");
 									
 									
-								if ($post_qty and $post_item_id){
-									$query = mysql_query("update ".$_SESSION["business_id"]."_items set qty=qty + '$post_qty', date='$date' where item_id='$post_item_id' ");
-									
-									//loggin
-									$loggin = mysql_query("insert into ".$_SESSION["business_id"]."_st_items values('','$post_item_id','$post_qty','$date','".$_SESSION["cur_user"]."',NOW())");
-									
+								if ($post_qty and $post_item_id){ 
+
+                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_items SET qty=qty + :post_qty, date = :date WHERE item_id = :post_item_id ");
+                                    $query = $stmt->execute(['post_qty' => $post_qty, 'date' => $date, 'post_item_id' => $post_item_id]);
+                                    
+                                    //loggin
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_items (id,item,qty,date,user,timeStamp) VALUES (:id,:item,:qty,:date,:user,NOW() ) ");
+				                    $query = $stmt->execute(['id' => "", 'item' => $post_item_id, 'qty' => $post_qty, 'date' => $date, 'user' => $_SESSION["cur_user"] ]);
+				
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Stock updated Successfully</div>";}
 									else { echo "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}
 								} else { echo "<div class='alert alert-danger' role='alert'>Fill all * fields</div>";}
@@ -179,23 +182,29 @@ protectPage(6);
                       		</tr>
                       	</thead>
                       	<tbody>
-                      			<?php
-							
-								$fetch_query = mysql_query("select * from ".$_SESSION["business_id"]."_items order by `date` DESC LIMIT 20");
-								if (mysql_num_rows($fetch_query)>0){
-									$sn=1;
-									for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-										
-										$rec = mysql_fetch_array($fetch_query);
-											
-											$fetched_cat_id = $rec["item_id"]; $fetch_name = $rec["name"]; $fetch_qty = $rec["qty"];
-										
-										
-										echo "<tr><td>$sn</td> <td>$fetch_name</td> <td>$fetch_qty</td> </tr>";
-										$sn++;
-									}
-								}
-							?>
+                        <?php
+
+                            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items ORDER BY `date` DESC LIMIT 20 ");
+                            $stmt->execute();
+
+                            $rows = $stmt->rowCount();
+                        
+                            if ($rows>0){
+
+                                $sn=1;
+                                for($i=0; $i<$rows; $i++){
+                                    
+                                    $row = $stmt->fetch();
+                                        
+                                    $fetched_cat_id = $row->item_id; 
+                                    $fetch_name = $row->name; 
+                                    $fetch_qty = $row->qty;
+                                    
+                                    echo "<tr><td>$sn</td> <td>$fetch_name</td> <td>$fetch_qty</td> </tr>";
+                                    $sn++;
+                                }
+                            }
+                        ?>
                       	</tbody>
                       	
                       </table>

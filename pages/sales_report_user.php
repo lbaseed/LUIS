@@ -196,38 +196,46 @@ protectPage(9);
 											$user = sanitize($_GET["user"]);
 											$dt = split(":",sanitize($_GET["dt"]));
 											
-								if ($user and $dt){
-									
+								            if ($user and $dt){
 								
-											$dt1 = trim($dt[0]);  
-											$dt2 = trim($dt[1]);
-											$grand_total = 0;
-											$total_profit = 0;
-										if($user=="All"){ 
-											$get_records = mysql_query("select * from ".$_SESSION["business_id"]."_trans where date BETWEEN '$dt1' AND '$dt2' order by `date` DESC");
-										} else {
+                                                $dt1 = trim($dt[0]);  
+                                                $dt2 = trim($dt[1]);
+                                                $grand_total = 0;
+                                                $total_profit = 0;
+                                                
+                                                if($user=="All"){ 
+
+                                                    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_trans WHERE date BETWEEN :dt1 AND :dt2 ORDER BY `date` DESC ");
+                                                    $stmt->execute(['dt1' => $dt1, 'dt2' => $dt2 ]);
+
+                                                } else {
+                                                    
+                                                    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_trans WHERE cashier = :user AND date BETWEEN :dt1 AND :dt2 ORDER BY `date` DESC ");
+                                                    $stmt->execute(['user' => $user, 'dt1' => $dt1, 'dt2' => $dt2 ]);
+                                                }	
+                                            
+                                                $rows = $stmt->rowCount();
 											
-											$get_records = mysql_query("select * from ".$_SESSION["business_id"]."_trans where cashier='$user' and date BETWEEN '$dt1' AND '$dt2' order by `date` DESC");
-										}	
-											
-											
-											if(mysql_num_rows($get_records)>0){
-												$sn = 1; 
-												for($i=0; $i<mysql_num_rows($get_records); $i++){
-													$rec = mysql_fetch_array($get_records);
-													
-													$tid = $rec["tid"]; $total_sales = $rec["total_sales"];
-													$cid = $rec["cid"];
-													if ($cid>0){ $type = get_customer($cid);  } else { $type = "Walk in Customer"; }
-													
-													$date = $rec["date"];
-													$cashier = $rec["cashier"]; 
-													$profit = get_profit($tid);
-													
-													//summation of total sales and profit
-													$grand_total +=$total_sales;
-													$total_profit += $profit;
-													
+                                                if($rows>0){
+                                                    $sn = 1; 
+                                                    
+                                                    for($i=0; $i<$rows; $i++){
+
+                                                        $row = $stmt->fetch();
+                                                        
+                                                        $tid = $row->tid; 
+                                                        $total_sales = $row->total_sales;
+                                                        $cid = $row->cid;
+                                                        if ($cid>0){ $type = get_customer($cid);  } else { $type = "Walk in Customer"; }
+                                                        
+                                                        $date = $row->date;
+                                                        $cashier = $row->cashier; 
+                                                        $profit = get_profit($tid);
+                                                        
+                                                        //summation of total sales and profit
+                                                        $grand_total +=$total_sales;
+                                                        $total_profit += $profit;
+                                                        
 													echo "<tr>
 															<td>$sn</td>
 															<td> <a href='' id='record_id'>$tid</a> </td>

@@ -343,24 +343,30 @@ if($_SESSION["clearance"]==6 || $_SESSION["clearance"]==4) {header("Location: in
                       	</thead>
                       	<tbody>
                       			<?php
-							
-								$fetch_query = mysql_query("select * from ".$_SESSION["business_id"]."_items where status=1 order by `date` DESC LIMIT 10");
-								if (mysql_num_rows($fetch_query)>0){
-									$sn=1;
-									for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-										$rec = mysql_fetch_array($fetch_query);
-											
-											$fetched_id = $rec["item_id"]; $fetch_item_name = $rec["name"];
-										
-										$fetch_cost_price = $rec["cost_price"]; $fetch_sale_price = $rec["sale_price"];
-										$fetch_item_qty = $rec["qty"];
-										
-										echo "<tr><td>$sn</td> <td><a href=''>$fetch_item_name </a></td> <td>$fetch_item_qty</td>  <td>". number_format($fetch_sale_price)."</td> <td>
-										
-										</td> </tr>";
-										$sn++;
-									}
-								}
+
+															$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE status=1 ORDER BY `date` DESC LIMIT 10 ");
+															$stmt->execute();
+
+															$rows = $stmt->rowCount();
+
+															if ($rows>0){
+																$sn=1;
+																for($i=0; $i<$rows; $i++){
+
+																	$row = $stmt->fetch();
+																		
+																	$fetched_id = $row->item_id; 
+																	$fetch_item_name = $row->name;
+																	$fetch_cost_price = $row->cost_price; 
+																	$fetch_sale_price = $row->sale_price;
+																	$fetch_item_qty = $row->qty;
+																	
+																	echo "<tr><td>$sn</td> <td><a href=''>$fetch_item_name </a></td> <td>$fetch_item_qty</td>  <td>". number_format($fetch_sale_price)."</td> <td>
+																	
+																	</td> </tr>";
+																	$sn++;
+																}
+															}
 							?>
                       	</tbody>
                       	

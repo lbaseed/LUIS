@@ -172,18 +172,24 @@ protectPage(9);
 											
 											//search sales record
 											$dt1 = sanitize($_GET["dt1"]);
-											$dt2 = sanitize($_GET["dt2"]);
-											$get_records = mysql_query("select * from ".$_SESSION["business_id"]."_trans where date BETWEEN '$dt1' AND '$dt2' order by `date` DESC");
-											
-											if(mysql_num_rows($get_records)>0){
+                                            $dt2 = sanitize($_GET["dt2"]);
+                                            
+											$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_trans WHERE date BETWEEN '$dt1' AND '$dt2' ORDER BY `date` DESC ");
+                                            $stmt->execute();
+
+                                            $rows = $stmt->rowCount();	
+
+											if($rows>0){
 												
-												for($i=0; $i<mysql_num_rows($get_records); $i++){
-													$rec = mysql_fetch_array($get_records);
+												for($i=0; $i<$rows; $i++){
+
+													$row = $stmt->fetch();
 													
-													$tid = $rec["tid"]; $total_sales = $rec["total_sales"];
-													$type = $rec["cid"]; 
-													$date = $rec["date"];
-													$cashier = $rec["cashier"]; 
+                                                    $tid = $row->tid; 
+                                                    $total_sales = $row->total_sales;
+													$type = $row->cid; 
+													$date = $row->date;
+													$cashier = $row->cashier; 
 													$profit = get_profit($tid);
 													
 													echo "<tr>

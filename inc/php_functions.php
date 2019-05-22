@@ -2,7 +2,8 @@
 
     ob_start(); 
     //$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
-    $_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
+    $_SESSION["home_link"] = "http://localhost:81/LUIS/pages/"; 
+    //$_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
 
     $Config = new Config;
     $conn = $Config->connect();
@@ -1410,8 +1411,11 @@ function initializeTables($business_id){
 
 function updateBusinesses($business_id){
 
+    global $conn;
     $date_verified = date("Y-m-d");
-    mysql_query("UPDATE businesses SET active_status = 'active', verified_status = 'verified', date_verified = '$date_verified' WHERE business_id = '$business_id'");
+
+    $stmt = $conn->prepare("UPDATE businesses SET active_status = 'active', verified_status = 'verified', date_verified = '$date_verified' WHERE business_id = '$business_id'");
+	$stmt->execute();
 
     return true;
 }
@@ -1423,10 +1427,15 @@ function logged_in(){
 }
 
 function checkChangePassword($username){
-    
-    $query = mysql_query("SELECT recover_password FROM ".$_SESSION["business_id"]."_users WHERE username = '$username' AND recover_password = 'yes'");
 
-    return (mysql_num_rows($query) >= 1) ? true : false;
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT recover_password FROM ".$_SESSION["business_id"]."_users WHERE username = :username AND recover_password = 'yes'");
+    $stmt->execute(['username' => $username]);
+
+    $rows = $stmt->rowCount();
+    
+    return (($rows) >= 1) ? true : false;
 }
 
 function protectPage($clearance){
@@ -1461,7 +1470,7 @@ function sanitize($string){
     //$string = strip_tags($string);
     $string = htmlentities($string);
     $string = stripslashes($string);
-    return mysql_real_escape_string($string);
+    return ($string);
 }
 
 function escape($string){
@@ -1499,35 +1508,49 @@ function notify($msg,$owner,$subject,$from){
 
 function getCustomerBal($customer) {
 
-     $q = mysql_query("select * from ".$_SESSION["business_id"]."_customers where  ID='$customer' ") or die (mysql_error());
- 
-     if (mysql_num_rows($q)>0){
+    global $conn;
 
-        $row = mysql_fetch_array($q);
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE  ID= :customer ");
+    $stmt->execute(['customer' => $customer]);
+
+    $rows = $stmt->rowCount();
+
+    if ($rows>0){
+
+        $row = $stmt->fetch();
  
-        $total_debt = $row["total_debt"];
-        $total_credit = $row["total_credit"];
+        $total_debt = $row->total_debt;
+        $total_credit = $row->total_credit;
      
-         return ($total_credit - $total_debt);
+        return ($total_credit - $total_debt); 
      }
   
 }
  
 function getDailyDeposites($date1, $date2, $type, $payment_class){
-
+    //Look for better way to include payment class in prepared statement
+    global $conn;
     $total_deposites = 0;
-    if($payment_class){ $q = mysql_query("select * from ".$_SESSION["business_id"]."_payment_details where date between '$date1' and '$date2' and payment_type='$payment_class' ");}
-    else {$q = mysql_query("select * from ".$_SESSION["business_id"]."_payment_details where date between '$date1' and '$date2' ");}
 
-        if (mysql_num_rows($q)>0){
+    if($payment_class){ 
+        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE date between '$date1' and '$date2' and payment_type='$payment_class' ";
+    }else {
+        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details where date between '$date1' and '$date2' ";
+    }
 
-            while($row = mysql_fetch_array($q)){
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $rows = $stmt->rowCount();
+
+        if ($rows>0){
+
+            while($row = $stmt->fetch()){
                 
-                $amount = $row["amount"];
-                $cash_amount = $row["cash"];
-                $pos_amount = $row["pos"];
-                $transfer_amount = $row["transfer"];
-
+                $amount = $row->amount;
+                $cash_amount = $row->cash;
+                $pos_amount = $row->pos;
+                $transfer_amount = $row->transfer;
 
                 switch ($type){
 
@@ -1546,10 +1569,13 @@ function getDailyDeposites($date1, $date2, $type, $payment_class){
 
 function insertReturn($trans_id, $reason){
  
+    global $conn;
     $user = $_SESSION["cur_user"];
     $today = date("Y-m-d");
-    $query = mysql_query("INSERT INTO ".$_SESSION["business_id"]."_return values('','$trans_id','$reason','$user','$today','','','awaitingapproval')");
 
+    $stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_return values('','$trans_id','$reason','$user','$today','','','awaitingapproval')");
+    $query = $stmt->execute();
+    
     if ($query) {
         return true;
     }else {
