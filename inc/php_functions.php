@@ -1,8 +1,8 @@
 <?php 
-
+    // error_reporting(0);
     ob_start(); 
     //$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
-    $_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
+    $_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
 
     $Config = new Config;
     $conn = $Config->connect();
@@ -1419,7 +1419,7 @@ function updateBusinesses($business_id){
 function logged_in(){
     //return (isset($_SESSION['cur_user']) && isset($_SESSION["business_id"]) && isset($_SESSION["clearance"])) ? true : false;
     
-    if ($_SESSION['cur_user'] == "") {return false;} else {return true;}
+    if (isset($_SESSION['cur_user']) == "") {return false;} else {return true;}
 }
 
 function checkChangePassword($username){
