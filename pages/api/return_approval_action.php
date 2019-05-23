@@ -1,5 +1,8 @@
 <?php
-ob_start(); include("../../inc/config.php"); include("../../inc/php_functions.php");   
+//Study roll back and apply
+ob_start(); 
+include("../../inc/config.php"); 
+include("../../inc/php_functions.php");   
 
     if (isset($_POST["action"])) {
 
@@ -8,55 +11,78 @@ ob_start(); include("../../inc/config.php"); include("../../inc/php_functions.ph
         $today = date("Y-m-d");
         
         if ($_POST["action"] == "approve") {
+
+            $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = :user, approved_date = :today, status = 'approved' WHERE trans_id=:transaction_id ");
+            $query = $stmt->execute(['user' => $user, 'today' => $today, 'transaction_id' => $transaction_id ]);
+
+            //$query = mysql_query("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = '$user', approved_date = '$today', status = 'approved' WHERE trans_id = '$transaction_id'");
+
+            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :transaction_id ");
+            $get_records = $stmt->execute(['transaction_id' => $transaction_id ]);
+
+            //$get_records = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = '$transaction_id'");
             
-            $query = mysql_query("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = '$user', approved_date = '$today', status = 'approved' WHERE trans_id = '$transaction_id'");
+            $rows = $stmt->rowCount();
 
-            $get_records = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = '$transaction_id'");
-                                        
-                if(mysql_num_rows($get_records)>0){
+            if($rows>0){
 
-                    for($i=0; $i<mysql_num_rows($get_records); $i++){
+                for($i=0; $i<$rows; $i++){
 
-                        $row = mysql_fetch_array($get_records);
-                        
-                        $item_id = $row["item_id"]; 
-                        $quantity = $row["qty"];
+                    $row = $stmt->fetch();
+                    
+                    $item_id = $row->item_id; 
+                    $quantity = $row->qty;
 
-                        mysql_query("UPDATE ".$_SESSION["business_id"]."_items SET qty = qty + '$quantity' WHERE item_id = '$item_id'");
+                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_items SET qty = qty + :quantity WHERE item_id = :item_id ");
+                    $stmt->execute(['quantity' => $quantity, 'item_id' => $item_id ]);
 
-                    }
+                    //mysql_query("UPDATE ".$_SESSION["business_id"]."_items SET qty = qty + '$quantity' WHERE item_id = '$item_id'");
+
                 }
-            
-                $query1 = mysql_query("UPDATE ".$_SESSION["business_id"]."_sales SET status = 'returned' WHERE trans_id = '$transaction_id'");
-                $query2 = mysql_query("UPDATE ".$_SESSION["business_id"]."_trans SET status = 'returned', total_sales=0 WHERE tid = '$transaction_id'");
-                $query3 = mysql_query("UPDATE ".$_SESSION["business_id"]."_payment_analysis SET status = 'returned' WHERE tid = '$transaction_id'");
-                                    
-
-
-            if ($query && $query1 && $query2 && $query3) {
-
-                echo "ApprovalSuccess";
-
-            }else {
-
-                echo "ApprovalFailure";
-
             }
+
+            $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_sales SET status = 'returned' WHERE trans_id = :transaction_id ");
+            $query1 = $stmt->execute(['transaction_id' => $transaction_id ]);
+
+            $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_trans SET status = 'returned', total_sales=0 WHERE tid = :transaction_id ");
+            $query2 = $stmt->execute(['transaction_id' => $transaction_id ]);
+
+            $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_payment_analysis SET status = 'returned' WHERE tid = :transaction_id ");
+            $query3 = $stmt->execute(['transaction_id' => $transaction_id ]);
+
+            //$query1 = mysql_query("UPDATE ".$_SESSION["business_id"]."_sales SET status = 'returned' WHERE trans_id = '$transaction_id'");
+            //$query2 = mysql_query("UPDATE ".$_SESSION["business_id"]."_trans SET status = 'returned', total_sales=0 WHERE tid = '$transaction_id'");
+            //$query3 = mysql_query("UPDATE ".$_SESSION["business_id"]."_payment_analysis SET status = 'returned' WHERE tid = '$transaction_id'");
+                                
+
+
+        if ($query && $query1 && $query2 && $query3) {
+
+            echo "ApprovalSuccess";
 
         }else {
-            
-            $query = mysql_query("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = '$user', approved_date = '$today', status = 'rejected' WHERE trans_id = '$transaction_id'");
 
-            if ($query) {
+            echo "ApprovalFailure";
 
-                echo "RejectionSuccess";
-
-            }else {
-
-                echo "RejectionFailure";
-
-            }
         }
+
+    }else {
+
+        $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = :user, approved_date = '$today', status = 'rejected' WHERE trans_id = :transaction_id ");
+        $query = $stmt->execute(['user' => $user, 'transaction_id' => $transaction_id ]);
+
+        //$query = mysql_query("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = '$user', approved_date = '$today', status = 'rejected' WHERE trans_id = '$transaction_id'");
+
+        if ($query) {
+
+            echo "RejectionSuccess";
+
+        }else {
+
+            echo "RejectionFailure";
+
+        }
+    }
 
 
     }

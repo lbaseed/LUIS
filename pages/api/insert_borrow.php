@@ -1,12 +1,14 @@
 <?php
+//CHECK IF NOW WORKED IN LINE 98
+//CHECK LINE 137 if Balance worked
+require("../../inc/config.php"); 
+require("../../inc/php_functions.php");
 
-		require("../../inc/config.php"); require("../../inc/php_functions.php");
-
-$business_id = $_SESSION["business_id"];
+	$business_id = $_SESSION["business_id"];
 
 	if(isset($_POST['myData'])){
 		
- $obj = json_decode( json_encode($_POST['myData']), true);
+ 		$obj = json_decode( json_encode($_POST['myData']), true);
  
 		$tid = time();
 		$dt = date("Y-m-d");
@@ -23,23 +25,20 @@ $business_id = $_SESSION["business_id"];
 			$sub_total = $item_price * $item_qty;
 			$item_category = getTableData($business_id."_items", "item_id", $item_id, "cat_id");
 		
-			
+			//insert borrow
+			$cost_price = getCostPrice($item_id);
 
-			
+			$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_borrow (borrow_id,item_id,qty,cost_price,borrow_price,sub_total,trans_id,date,cashier) VALUES (:id, :item_id, :item_qty, :cost_price, :item_price, :sub_total, :tid, :dt, :cur_user) ");
+			$stmt->execute(['id' => "", 'item_id' => $item_id, 'item_qty' => $item_qty, 'cost_price' => $cost_price, 'item_price' => $item_price, 'sub_total' => $sub_total, 'tid' => $tid, 'dt' => $dt, 'cur_user' => $_SESSION["cur_user"] ]);
 				
-				//insert borrow
-				$cost_price = getCostPrice($item_id);
+			//$sales_id = mysql_insert_id();
 				
-				$insert_borrow = mysql_query("insert into ".$business_id."_borrow values('','$item_id','$item_qty','$cost_price','$item_price','$sub_total','$tid','$dt','".$_SESSION["cur_user"]."')");
-				
-		
-				//$sales_id = mysql_insert_id();
-				
-				if($item_serial !=""){
-				//$insert_serails = mysql_query("insert into ".$business_id."_items_serials values('','$item_id','$item_serial','$sales_id',NOW()) ");
-				}
-				$total_qty += $item_qty;
-				$total +=$sub_total;
+			if($item_serial !=""){
+			//$insert_serails = mysql_query("insert into ".$business_id."_items_serials values('','$item_id','$item_serial','$sales_id',NOW()) ");
+			}
+
+			$total_qty += $item_qty;
+			$total +=$sub_total;
 
 				//store daily sales
 
@@ -90,16 +89,17 @@ $business_id = $_SESSION["business_id"];
 
 				//type 2 denotes borrower
 				$type = 2;
+
+				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_customers (ID,full_name,address,phone,total_debt,total_credit,type) VALUES (:id, :cust_name, :cust_address, :cust_phone, :bal, :total_credit, :type) ");
+				$stmt->execute(['id' => "", 'cust_name' => $cust_name, 'cust_address' => $cust_address, 'cust_phone' => $cust_phone, 'bal' => $bal, 'total_credit' => 0, 'type' => $type ]);
 				
-				$add_customer = mysql_query("insert into ".$business_id."_customers values('','$cust_name','$cust_address','$cust_phone','$bal','0','$type') ");
-				$cust_id = mysql_insert_id();
+				$cust_id = $conn->lastInsertId(); 
 				
-			
-			
-		
-		
-																						//`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`
-		$insert_trans = mysql_query("insert into ".$business_id."_borrow_trans values('$tid','$total','$dt','$mop','$am_tendered','$change','$bal','$cust_id','".$_SESSION["cur_user"]."',NOW()) ");
+				//`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`
+				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_borrow_trans (tid,total_sales,date,mop,amount_tendered,change,balance,cid,cashier,timeStamp) VALUES (:tid, :total, :dt, :mop, :am_tendered, :change, :bal, :cust_id, :cur_user, NOW()) ");
+				$insert_trans = $stmt->execute(['tid' => $tid, 'total' => $total, 'dt' => $dt, 'mop' => $mop, 'am_tendered' => $am_tendered, 'change' => $change, 'bal' => $bal, 'cust_id' => $cust_id, 'cur_user' => $_SESSION["cur_user"] ]);
+				
+				//$insert_trans = mysql_query("insert into ".$business_id."_borrow_trans values('$tid','$total','$dt','$mop','$am_tendered','$change','$bal','$cust_id','".$_SESSION["cur_user"]."',NOW()) ");
     /*    
         //$insert_payment_analysis = mysql_query("insert into ".$business_id."_payment_analysis values('',NOW(),'$tid','$total','$cash_mop','$pos_mop','$trnf_mop','$bal') ");
 		
@@ -133,28 +133,35 @@ $business_id = $_SESSION["business_id"];
 		//$newDebt=$obj[2];
 		//$amount_tendered=$obj[3];
 		$dt = date("Y-m-d");
-<<<<<<< HEAD
 		$bal=$total-$amount_tendered;
+
+		$stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_trans SET amount_tendered = :amount_tendered, balance = balance-:amount_tendered, cashier = :cashier, timeStamp=NOW() WHERE trans_id = :trans_id ");
+		$trans = $stmt->execute(['amount_tendered' => $amount_tendered, 'cashier' => $_SESSION["cur_user"], 'trans_id' => $trans_id]);
 		
-		$trans = mysql_query("update ".$business_id."_trans set amount_tendered='$amount_tendered',balance=balance-'$amount_tendered',cashier='".$_SESSION["cur_user"]."',timeStamp=NOW(), where trans_id='$trans_id'");
-    $upt_dailysales=mysql_query("insert into ".$business_id."_daily_sales values('','$t','$amount_tendered','1')");
-		$pymnt_anl=mysql_query("insert into ".$business_id."_payment_analysis values('',NOW(),'$trans_id','$amount_tendered','1','0','0','$bal')");
-=======
+		//$trans = mysql_query("update ".$business_id."_trans set amount_tendered='$amount_tendered',balance=balance-'$amount_tendered',cashier='".$_SESSION["cur_user"]."',timeStamp=NOW(), where trans_id='$trans_id'");
+		
+		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_daily_sales (id,date,category_daily_total,category) VALUES (:id,:date,:category_daily_total,:category) ");
+		$upt_dailysales = $stmt->execute(['id' => "", 'date' => $t, 'category_daily_total' => $amount_tendered, 'category' => 1 ]);
+				
+		//$upt_dailysales=mysql_query("insert into ".$business_id."_daily_sales values('','$t','$amount_tendered','1')");
+		
+		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_analysis (id,date,tid,amount,cash,pos,transfer,balance,status) VALUES (:id,NOW(),:tid,:amount,:cash,:pos,:transfer,:balance,:status) ");
+		$pymnt_anl = $stmt->execute(['id' => "", 'tid' => $trans_id, 'amount' => $amount_tendered, 'cash' => 1, 'pos' => 0, 'transfer' => 0 , 'balance' => $bal, 'status' => ""]);
+				
+		//$pymnt_anl=mysql_query("insert into ".$business_id."_payment_analysis values('',NOW(),'$trans_id','$amount_tendered','1','0','0','$bal')");
+		
 		//$bal=$total-$amount_tendered;
 		$T=$business_id."_borrow_trans";   //transaction table name
 		$C=$business_id."_customers"; // customer table name
 		
+		$stmt = $conn->prepare("UPDATE ".$T." JOIN ".$C." ON ".$T.".cid=".$C.".ID  SET mop='$status',cashier='".$_SESSION["cur_user"]."',timeStamp=NOW(),balance=0,total_debt=0 WHERE tid='$trans_id' ");
+		$trans = $stmt->execute();
+		
 		//$trans =  mysql_query("UPDATE ".$T." INNER JOIN ".$C." ON ".$T.".cid=".$C.".ID SET ".$T.".amount_tendered='$amount_tendered',".$T.".balance=".$T.".balance-'$amount_tendered',".$T.".cashier='".$_SESSION["cur_user"]."',".$T.".timeStamp=NOW(), ".$C.".total_debt='$newDebt' where ".$T.".tid='$trans_id'");
-<<<<<<< HEAD
-		$trans =  mysql_query("UPDATE ".$T." JOIN ".$C." ON ".$T.".cid=".$C.".ID  SET mop='$status',cashier='".$_SESSION["cur_user"]."',timeStamp=NOW(),balance=0,total_debt=0 where tid='$trans_id'");
-=======
-		$trans =  mysql_query("UPDATE ".$T."  SET mop='sold',cashier='".$_SESSION["cur_user"]."',timeStamp=NOW() where tid='$trans_id'");
->>>>>>> mylocal
->>>>>>> master
+		//$trans =  mysql_query("UPDATE ".$T." JOIN ".$C." ON ".$T.".cid=".$C.".ID  SET mop='$status',cashier='".$_SESSION["cur_user"]."',timeStamp=NOW(),balance=0,total_debt=0 where tid='$trans_id'");
 		
     //$upt_dailysales=mysql_query("insert into ".$business_id."_daily_sales values('','$dt','$amount_tendered','1')");
 		//$pymnt_anl=mysql_query("insert into ".$business_id."_payment_analysis values('',NOW(),'$trans_id','$amount_tendered','1','0','$0','$newDebt')");
-		
 		
 		
 	if($trans){echo $trans_id;}
@@ -164,9 +171,14 @@ $business_id = $_SESSION["business_id"];
 	
 
 function deductQty($item_id, $qty){
+	global $conn;
 	
 	$business_id = $_SESSION["business_id"];
-	$query = mysql_query("update ".$business_id."_items set qty=qty - $qty where item_id='$item_id'");
+
+	$stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_items SET qty=qty - :qty WHERE item_id=:item_id ");
+	$query = $stmt->execute(['qty' => $qty, 'item_id' => $item_id]);
+
+	//$query = mysql_query("update ".$business_id."_items set qty=qty - $qty where item_id='$item_id'");
 	
 	if ($query) {return "done"; }
 	//insert into query logs table
@@ -174,10 +186,20 @@ function deductQty($item_id, $qty){
 
 function getCostPrice($item_id){
 	
+	global $conn;
 	$cost_price = 0;
-	$query = mysql_query("select * from ".$_SESSION["business_id"]."_items where item_id='$item_id'");
-		
-	if(mysql_num_rows($query)>0){ $cost_price = mysql_result($query, 0, "cost_price");}
+
+	$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id=:item_id ");
+	$query = $stmt->execute(['item_id' => $item_id]);
+
+	//$query = mysql_query("select * from ".$_SESSION["business_id"]."_items where item_id='$item_id'");
+	
+	$rows = $stmt->rowCount();
+
+	if($rows>0){ 
+		$row = $stmt->fetch();
+		$cost_price = $row->cost_price;
+	}
 	
 	return $cost_price;
 }

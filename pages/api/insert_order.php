@@ -1,4 +1,6 @@
-<?php require("../../inc/config.php"); require("../../inc/php_functions.php");
+<?php 
+	require("../../inc/config.php"); 
+	require("../../inc/php_functions.php");
 
 $business_id = $_SESSION["business_id"];
 
@@ -20,9 +22,13 @@ $business_id = $_SESSION["business_id"];
 			
 			$sub_total = $item_price * $item_qty;
 			$total += $sub_total;
-				//insert order
+			
+			//insert order
+
+			$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_order_details (oid,item_id,qty,price,value,ref) VALUES (:oid,:item_id,:qty,:price,:value,:ref)");
+    		$insert_sale = $stmt->execute(['oid' => "", 'item_id' => $item_id, 'item_qty' => $item_qty, 'item_price' => $item_price]);
 				
-				$insert_sale = mysql_query("insert into ".$business_id."_order_details values('','$item_id','$item_qty','$item_price','$sub_total','$tid','$dt')");
+			//$insert_sale = mysql_query("insert into ".$business_id."_order_details values('','$item_id','$item_qty','$item_price','$sub_total','$tid','$dt')");
 			
 			
 		}
@@ -39,17 +45,23 @@ $business_id = $_SESSION["business_id"];
 		{
 			$cu_id = $obj[$srch_index]["supp_id"];
 			
+			$cust_id = $cu_id;
+			//add to customers debts records
+
+			$stmt = $conn->prepare("UPDATE ".$business_id."_suppliers SET total_credit=total_credit + :total WHERE ID = :cust_id ");
+			$stmt->execute(['total' => $total, 'cust_id'=> $cust_id]);
 			
-				
-				$cust_id = $cu_id;
-				//add to customers debts records
-				$add_debt = mysql_query("update ".$business_id."_suppliers set total_credit=total_credit + $total where ID='$cust_id'");
+			//$add_debt = mysql_query("update ".$business_id."_suppliers set total_credit=total_credit + $total where ID='$cust_id'");
 			
 			
 		}
 		
-																						//`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`
-		$insert_trans = mysql_query("insert into ".$business_id."_placed_order values('$tid','$cust_id','$total','$dt','','','NOT_SUPPLIED') ");
+		$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_placed_order () VALUES (:tid,:cust_id,:total,:dt,'','','NOT_SUPPLIED')");
+		$insert_trans = $stmt->execute(['tid' => $tid,'cust_id' => $cust_id, 'total' => $total, 'dt' => $dt]);
+		
+		//`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`
+		
+		//$insert_trans = mysql_query("insert into ".$business_id."_placed_order values('$tid','$cust_id','$total','$dt','','','NOT_SUPPLIED') ");
 		
 		
 		if ($insert_trans) {echo $tid;}
@@ -58,9 +70,15 @@ $business_id = $_SESSION["business_id"];
 	
 
 function deductQty($item_id, $qty){
+
+	global $conn;
 	
 	$business_id = $_SESSION["business_id"];
-	$query = mysql_query("update ".$business_id."_items set qty=qty - $qty where item_id='$item_id'");
+
+	$stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_items SET qty=qty - :qty WHERE item_id=:item_id ");
+	$query = $stmt->execute(['qty' => $qty, 'item_id' => $item_id]);
+	
+	//$query = mysql_query("update ".$business_id."_items set qty=qty - $qty where item_id='$item_id'");
 	
 	if ($query) {return "done"; }
 	//insert into query logs table
@@ -68,10 +86,20 @@ function deductQty($item_id, $qty){
 
 function getCostPrice($item_id){
 	
+	global $conn;
 	$cost_price = 0;
-	$query = mysql_query("select * from ".$_SESSION["business_id"]."_items where item_id='$item_id'");
-		
-	if(mysql_num_rows($query)>0){ $cost_price = mysql_result($query, 0, "cost_price");}
+
+	$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id=:item_id ");
+	$query = $stmt->execute(['item_id' => $item_id]);
+
+	//$query = mysql_query("select * from ".$_SESSION["business_id"]."_items where item_id='$item_id'");
+	
+	$rows = $stmt->rowCount();
+
+	if($rows>0){ 
+		$row = $stmt->fetch();
+		$cost_price = $row->cost_price;
+	}
 	
 	return $cost_price;
 }

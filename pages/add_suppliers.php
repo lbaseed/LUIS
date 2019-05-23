@@ -86,10 +86,11 @@ protectPage(6);
 									
 									
 								if ($full_name and $address and $pnum ){
+
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_suppliers (ID,full_name,address,phone,total_debt,total_credit) VALUES (:ID,:full_name,:address,:phone,:total_debt,:total_credit) ");
+				                    $query = $stmt->execute(['ID' => "",'full_name' => $full_name,'address' => $address,'phone'=>$pnum,'total_debt'=>0,'total_credit'=>0 ]);
 									
-									$query = mysql_query("insert into ".$_SESSION["business_id"]."_suppliers values('','$full_name','$address','$pnum','0','0')");
-									
-									$customer_id  = mysql_insert_id();
+									$customer_id  = $conn->lastInsertId();
 									
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Customer Added Successfully [$customer_id]</div>"; }
 									else { echo "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}
@@ -179,31 +180,36 @@ protectPage(6);
                       		</tr>
                       	</thead>
                       	<tbody>
-                      			<?php
-							
-								$fetch_query = mysql_query("select * from ".$_SESSION["business_id"]."_suppliers order by `total_credit` DESC");
-								
-							if (mysql_num_rows($fetch_query)>0){
-									$sn=1;
-								
-									for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-										$rec = mysql_fetch_array($fetch_query);
-											
-											$fetched_id = $rec["ID"]; $fetch_customer_name = $rec["full_name"];
-										
-                                        $fetch_phone = $rec["phone"]; $fetch_address = $rec["address"];
-                                        $fetch_credit = $rec["total_credit"];
-                                        $fetch_debt = $rec["total_debt"]; 
-                                        $customer_debt = $fetch_credit - $fetch_debt;
-										
-										echo "<tr><td>$sn</td> <td><a href=''>$fetched_id</a></td> <td>$fetch_customer_name</td> <td>$fetch_address</td> <td>$fetch_phone</td> <td>
-										" .number_format($customer_credit)."
-										</td> </tr>";
-										$sn++;
-									}
-								
-								}
-							?>
+                        <?php
+
+                            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers ORDER BY `total_credit` DESC ");
+                            $stmt->execute();
+
+                            $rows = $stmt->rowCount();
+                    
+                            if ($rows>0){
+                                $sn=1;
+                            
+                                for($i=0; $i<$rows; $i++){
+
+                                    $row = $stmt->fetch();
+                                        
+                                    $fetched_id = $row->ID; 
+                                    $fetch_customer_name = $row->full_name;
+                                    $fetch_phone = $row->phone; 
+                                    $fetch_address = $row->address;
+                                    $fetch_credit = $row->total_credit;
+                                    $fetch_debt = $row->total_debt; 
+                                    $customer_debt = $fetch_credit - $fetch_debt;
+                                    
+                                    echo "<tr><td>$sn</td> <td><a href=''>$fetched_id</a></td> <td>$fetch_customer_name</td> <td>$fetch_address</td> <td>$fetch_phone</td> <td>
+                                    " .number_format($customer_credit)."
+                                    </td> </tr>";
+                                    $sn++;
+                                }
+                                    
+                                    }
+                        ?>
                       	</tbody>
                       	<tfoot>
                         		

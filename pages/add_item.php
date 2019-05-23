@@ -113,8 +113,10 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
                                         
                                         
                                         if ($item_name and $cat and $cost_price and $sale_price){
-                                            $query = mysql_query("insert into ".$_SESSION["business_id"]."_items values('','$item_name','$qty','$cost_price','$sale_price','$cat','','$date',1,'$item_code')");
-                                        
+
+                                            $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_items (item_id, name, qty, cost_price, sale_price, cat_id, med_id, date, status, barcode) VALUES (:item_id, :name, :qty, :cost_price, :sale_price, :cat_id, :med_id, :date, :status, :barcode) ");
+                                            $query = $stmt->execute(['item_id' => "", 'name' => $item_name, 'qty' => $qty, 'cost_price' => $cost_price, 'sale_price' => $sale_price, 'cat_id' => $cat, 'med_id' => "", 'date' => $date, 'status' => 1, 'barcode' => $item_code ]);
+				
                                             if ($query) { 
                                                 echo "<div class='alert alert-success' role='alert'>Item Added Successfully</div>"; 
                                             }else {
@@ -233,37 +235,44 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
                       		</tr>
                       	</thead>
                       	<tbody>
-                      			<?php
-							$total_cost = 0;
-								$total_qty = 0;
-								$total_sale = 0;
-								$fetch_query = mysql_query("select * from ".$_SESSION["business_id"]."_items where status=1 order by `item_id` ASC");
-								
-							if (mysql_num_rows($fetch_query)>0){
-									$sn=1;
-								
-									for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-										$rec = mysql_fetch_array($fetch_query);
-											
-											$fetched_id = $rec["item_id"]; $fetch_item_name = $rec["name"];
-										
-										$fetch_cost_price = $rec["cost_price"]; $fetch_sale_price = $rec["sale_price"];
-										$fetch_item_qty = $rec["qty"]; $fetched_cat = getCategories($rec["cat_id"]);
-										
-										$total_cost += $fetch_cost_price * $fetch_item_qty;
-										$total_qty += $fetch_item_qty;
-										echo "<tr><td>$sn</td> <td><a href='update_item.php?item=$fetched_id'>$fetch_item_name</a></td> <td>$fetch_item_qty</td> <td>".number_format($fetch_cost_price)."</td> <td>" .number_format($fetch_sale_price)."</td> <td>
-										$fetched_cat
-										</td> </tr>";
-										$sn++;
-									}
+                        <?php
+                            $total_cost = 0;
+                            $total_qty = 0;
+                            $total_sale = 0;
+
+                            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE status = 1 ORDER BY item_id ASC");
+                            $stmt->execute();
+
+                            $rows = $stmt->rowCount();
+
+                            if ($rows>0){
+                                $sn=1;
+                            
+                                for($i=0; $i<$rows; $i++){
+
+                                    $row = $stmt->fetch();
+                                        
+                                    $fetched_id = $row->item_id; 
+                                    $fetch_item_name = $row->name;
+                                    $fetch_cost_price = $row->cost_price;
+                                    $fetch_sale_price = $row->sale_price;
+                                    $fetch_item_qty = $row->qty; 
+                                    $fetched_cat = getCategories($row->cat_id);
+                                    
+                                    $total_cost += $fetch_cost_price * $fetch_item_qty;
+                                    $total_qty += $fetch_item_qty;
+                                    echo "<tr><td>$sn</td> <td><a href='update_item.php?item=$fetched_id'>$fetch_item_name</a></td> <td>$fetch_item_qty</td> <td>".number_format($fetch_cost_price)."</td> <td>" .number_format($fetch_sale_price)."</td> <td>
+                                    $fetched_cat
+                                    </td> </tr>";
+                                    $sn++;
+                                }
 								
 								echo "<tr>
                       			<th> </th><th> Total </th><th>".number_format($total_qty)."</th><th> NGN".number_format($total_cost)."</th> <th></th> <th>  </th>
                       		</tr>";
 								
-								}
-							?>
+							}
+						?>
                       	</tbody>
                       	<tfoot>
                                         <tr>

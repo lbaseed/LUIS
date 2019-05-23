@@ -111,21 +111,24 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                 <?php
 
                                     $user = $_SESSION["cur_user"];
+
+                                    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_return WHERE status = 'awaitingapproval' ");
+                                    $stmt->execute();
+
+                                    $rows = $stmt->rowCount();
                                         
-                                    $get_records = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_return WHERE status = 'awaitingapproval' ");
-                                        
-                                        if(mysql_num_rows($get_records)>0){
+                                        if($rows>0){
 
                                                 $sn = 1; 
-                                                for($i=0; $i<mysql_num_rows($get_records); $i++){
+                                                for($i=0; $i<$rows; $i++){
 
-                                                    $row = mysql_fetch_array($get_records);
+                                                    $row = $stmt->fetch();
                                                     
-                                                    $trans_id = $row["trans_id"]; 
-                                                    $requestuser = $row['request_by'];
+                                                    $trans_id = $row->trans_id; 
+                                                    $requestuser = $row->request_by;
                                                     $tbl = $_SESSION["business_id"]."_users";
                                                     $requestby = getTableData($tbl, "username", "$requestuser", "fullname");
-                                                    $requestdate   = $row["request_date"];
+                                                    $requestdate   = $row->request_date;
 
                                                     echo "<tr>
                                                             <td>$sn</td>

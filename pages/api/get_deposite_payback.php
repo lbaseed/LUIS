@@ -1,30 +1,34 @@
 <?php
 
-		require("../../inc/config.php"); require("../../inc/php_functions.php");
+require("../../inc/config.php"); 
+require("../../inc/php_functions.php");
 
 	$tid = $_GET["id"];
 	$buss_id = $_SESSION["business_id"];
 
-		$q = mysql_query("SELECT * FROM ".$buss_id."_payment_details where id='$tid' ");
+	$tid = $_GET["tid"];
+	$buss_id = $_SESSION["business_id"];
 
-	
+	$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE id = :tid ");
+	$stmt->execute(['id' => $tid]);
 
-$output = array();
+    $rows = $stmt->rowCount();
 
-if (mysql_num_rows($q)>0){
-	
-	
-		
-		$row = mysql_fetch_array($q);
+	$output = array();
+
+	if ($rows>0){
+
+		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 		$output[] = $row;
 
 		$cust_id = $row["cust_id"];
 		$remaining_bal = getCustomerBal($cust_id);
 		array_push($output,$remaining_bal);
+
 	}	
-	
-	
-	print(json_encode($output));
+		
+		
+		print(json_encode($output));
 
 	
 

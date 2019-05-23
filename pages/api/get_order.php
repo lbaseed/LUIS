@@ -1,74 +1,90 @@
 <?php
 
-		require("../../inc/config.php");
+require("../../inc/config.php");
 
 	$tid = $_GET["tid"];
 	$buss_id = $_SESSION["business_id"];
 
-		$q = mysql_query("SELECT * FROM ".$buss_id."_order_details where ref='$tid' ");
+	$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_order_details WHERE ref = :tid ");
+	$stmt->execute(['tid' => $tid]);
 
-	$q2 = mysql_query("SELECT * FROM ".$buss_id."_placed_order where ref='$tid' ");
+    $rows = $stmt->rowCount();
 
-$output = array();
+	//$q2 = mysql_query("SELECT * FROM ".$buss_id."_placed_order where ref='$tid' ");
 
-if (mysql_num_rows($q)>0){
-	
-	for($i=0; $i<mysql_num_rows($q); $i++){
+	$output = array();
+
+	if ($rows>0){
 		
-		$row = mysql_fetch_array($q);
-		$output[] = $row;
+		for($i=0; $i<$rows; $i++){
+			
+			$row = $stmt->fetch(PDO::FETCH_ASSOC);
+			$output[] = $row;
+			
+			$output[$i]["ref"]= getName($output[$i]["item_id"]);
+			
+		}
+
+		$stmt2 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_placed_order WHERE ref = :tid ");
+		$stmt2->execute(['tid' => $tid]);
+
+		while($row2 = $stmt2->fetch(PDO::FETCH_ASSOC)){
+			
+			$output[] = $row2;
+
+			//get customer information
+			$cust_id = $row2["supplier"];
+
+			$stmt3 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers WHERE ID = :cust_id ");
+			$stmt3->execute(['cust_id' => $cust_id]);
+
+			while($row3 = $stmt3->fetch(PDO::FETCH_ASSOC)){
+				$output[] = $row3;
+			}
+			
+		}
 		
-		$output[$i]["ref"]= getName($output[$i]["item_id"]);
+		print(json_encode($output));
+		
 		
 	}
+		
+	function getName($id){
 
-	
-	
-	while($row2 = mysql_fetch_array($q2)){
-		
-		$output[] = $row2;
-		
-		
-				//get customer information
-		$cust_id = $row2["supplier"];
-		
-		
-				$get_customer = mysql_query("select * from ".$buss_id."_suppliers where ID='$cust_id'");
+		global $conn;
 
-				while($row3 = mysql_fetch_array($get_customer)){
-					$output[] = $row3;
-				}
-			
-			
-		
-	}
-	
-	
-	
-	print(json_encode($output));
-	
-	
-}
-	
-function getName($id){
-	
-	$q3 = mysql_query("select * from ".$_SESSION["business_id"]."_items where item_id='$id'");
-	
-		if(mysql_num_rows($q3)>0){
-			$name = mysql_result($q3, 0, "name");
+		$stmt4 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id = :id ");
+		$stmt4->execute(['id' => $id]);
+
+		$rows = $stmt4->rowCount();
+
+		if ($rows>0){
+			$row = $stmt4->fetch();
+
+			$name = $row->name;
 			return $name;
 		}
-}
+		
+	}
 
-function getSerial($salesID){
+	function getSerial($salesID){
+
+		global $conn;
 	
-	$q4 = mysql_query("select * from ".$_SESSION["business_id"]."_items_serials where sales_id='$salesID'");
-	
-		if(mysql_num_rows($q4)>0){
-			$serialNum = mysql_result($q4, 0, "serialNumber");
+		$stmt5 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items_serials WHERE sales_id = :sales_id ");
+		$stmt5->execute(['sales_id' => $salesID]);
+
+		$rows = $stmt5->rowCount();
+		
+		if ($rows>0){
+			$row = $stmt5->fetch();
+
+			$serialNum = $row->serialNumber;
 			return $serialNum;
-		} else { return "";}
-}
-
+		}else {
+			return "";
+		}
+			
+	}
 
 ?>

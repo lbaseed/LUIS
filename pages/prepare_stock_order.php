@@ -416,37 +416,44 @@ protectPage(6);
                                                     $total_profit = 0;
 
                                                     if($supplier=="ALL"){ 
-                                                        $get_records = mysql_query("select * from ".$_SESSION["business_id"]."_placed_order where dateOrdered BETWEEN '$dt1' AND '$dt2' order by `dateOrdered` DESC");
-                                                    } else {
-                                                        
-                                                        $get_records = mysql_query("select * from ".$_SESSION["business_id"]."_placed_order where supplier='$supplier' and dateOrdered BETWEEN '$dt1' AND '$dt2' order by `dateOrdered` DESC");
+
+                                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_placed_order WHERE dateOrdered BETWEEN :dt1 AND :dt2 ORDER BY `dateOrdered` DESC ");
+                                                        $stmt->execute(['dt1' => $dt1, 'dt2' => $dt2]);
+
+                                                    }else {
+
+                                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_placed_order WHERE supplier= :supplier AND dateOrdered BETWEEN :dt1 AND :dt2 ORDER BY `dateOrdered` DESC ");
+                                                        $stmt->execute(['supplier' => $supplier, 'dt1' => $dt1, 'dt2' => $dt2]);
+
                                                     }	
                                         
-											
+                                                    $rows = $stmt->rowCount();
                                             
-                                        
-											if(mysql_num_rows($get_records)>0){
-												$sn = 1; 
-												for($i=0; $i<mysql_num_rows($get_records); $i++){
-													$rec = mysql_fetch_array($get_records);
-													
-													$ref = $rec["ref"]; $value_ordered = $rec["valueOrdered"];
-                                                     $supplierID = $rec["supplier"];
-                          
-													$SupplierName = get_suppliers($supplierID);  
-													
-                                                    $date = $rec["dateOrdered"];
-                                                    $date_supplied = $rec["dateSupplied"];
-													$status = $rec["status"]; 
-													
-													//summation of total orders
-													$grand_total +=$value_ordered;
-													
-													echo "<tr>
-                                                    <td>$sn</td>
-                                                    <td> <a href=''>$ref</a> </td>
-                                                    
-                                                    <td>$SupplierName</td>
+                                                    if($rows>0){
+                                                        $sn = 1; 
+
+                                                        for($i=0; $i<$rows; $i++){
+
+                                                            $row = $stmt->fetch();
+                                                            
+                                                            $ref = $row->ref; 
+                                                            $value_ordered = $row->valueOrdered;
+                                                            $supplierID = $row->supplier;
+                                
+                                                            $SupplierName = get_suppliers($supplierID);  
+                                                            
+                                                            $date = $row->dateOrdered;
+                                                            $date_supplied = $row->dateSupplied;
+                                                            $status = $row->status; 
+                                                            
+                                                            //summation of total orders
+                                                            $grand_total +=$value_ordered;
+                                                            
+                                                            echo "<tr>
+                                                            <td>$sn</td>
+                                                            <td> <a href=''>$ref</a> </td>
+                                                            
+                                                            <td>$SupplierName</td>
                                                     <td>". number_format($value_ordered)."</td>
                                                     <td><label id='st_$ref'>$status</label></td>";
 
