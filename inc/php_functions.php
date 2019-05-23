@@ -2,12 +2,11 @@
     // error_reporting(0);
     ob_start(); 
     //$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
-<<<<<<< HEAD
-    $_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
-=======
+
+    //$_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
+
     $_SESSION["home_link"] = "http://localhost:81/LUIS/pages/"; 
-    //$_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
->>>>>>> fb6a6334416518076c94f43fc15f2051c834439b
+
 
     $Config = new Config;
     $conn = $Config->connect();
