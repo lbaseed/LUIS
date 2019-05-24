@@ -25,7 +25,7 @@ $business_id = $_SESSION["business_id"];
 			
 			//insert order
 
-			$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_order_details (oid,item_id,qty,price,value,ref) VALUES (:oid,:item_id,:qty,:price,:value,:ref)");
+			$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_order_details (oid,item_id,qty,price,value,ref,qtySupplied,priceSupplied,valueOfSupplied) VALUES (:oid,:item_id,:qty,:price,:value,:ref)");
     		$insert_sale = $stmt->execute(['oid' => "", 'item_id' => $item_id, 'item_qty' => $item_qty, 'item_price' => $item_price]);
 				
 			//$insert_sale = mysql_query("insert into ".$business_id."_order_details values('','$item_id','$item_qty','$item_price','$sub_total','$tid','$dt')");
