@@ -97,11 +97,10 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 									
 									
 								if ($cust_id and $cust_name and $cust_address and $cust_phone){
-									
-									$query = mysql_query("update ".$_SESSION["business_id"]."_customers set full_name='$cust_name', address='$cust_address', phone='$cust_phone' where ID='$cust_id'");
-									
-									
-									
+                                    
+                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_customers SET full_name= :cust_name, address = :cust_address, phone = :cust_phone WHERE ID = :cust_id ");
+                                    $query = $stmt->execute(['cust_name' => $cust_name, 'cust_address' => $cust_address, 'cust_phone' => $cust_phone, 'cust_id' => $cust_id]);
+
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Item Updated Successfully</div>"; }
 									else { echo "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}
 								} else { echo "<div class='alert alert-danger' role='alert'>Fill all * fields</div>";}
@@ -110,20 +109,24 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 							{
 								//display selected customer's infomration
 								$get_customer_id = $_GET["customer"];
-							
-								$fetch_query = mysql_query("select * from ".$_SESSION["business_id"]."_customers where ID='$get_customer_id'");
-								
-							if (mysql_num_rows($fetch_query)>0){
-									
-									
-										$rec = mysql_fetch_array($fetch_query);
-											
-											$fetched_id = $rec["ID"]; $fetch_customer_name = $rec["full_name"];
-										
-										$fetch_phone = $rec["phone"]; $fetch_address = $rec["address"];
-										$fetch_debt = $rec["total_debt"]; 
-										
-								}
+                            
+                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers where ID = :get_customer_id ");
+                                $stmt->execute(['get_customer_id' => $get_customer_id]);
+
+                                $rows = $stmt->rowCount();
+
+                                if ($rows>0){
+
+                                    $row = $stmt->fetch();
+                                        
+                                    $fetched_id = $row->ID; 
+                                    $fetch_customer_name = $row->full_name;
+                                    
+                                    $fetch_phone = $row->phone; 
+                                    $fetch_address = $row->address;
+                                    $fetch_debt = $row->total_debt; 
+                                            
+                                    }
 							}
 						?>
                         	<form action="" method="post">
@@ -206,11 +209,11 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 						
 								if(isset($_POST["post_payment"])){
 									
-									$customer = mysql_real_escape_string($_GET["customer"]);
+									$customer = sanitize($_GET["customer"]);
 									
-                                    $amount_cash = mysql_real_escape_string($_POST["amount_paid_cash"]);
-                                    $amount_pos = mysql_real_escape_string($_POST["amount_paid_pos"]);
-                                    $amount_trnf = mysql_real_escape_string($_POST["amount_paid_trnf"]);
+                                    $amount_cash = sanitize($_POST["amount_paid_cash"]);
+                                    $amount_pos = sanitize($_POST["amount_paid_pos"]);
+                                    $amount_trnf = sanitize($_POST["amount_paid_trnf"]);
 
                                     $total_payment = $amount_cash + $amount_pos + $amount_trnf;
 
@@ -224,7 +227,11 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 									if ($total_payment){
 										
                                     //insert payment information
-                                    	$insert_payment = mysql_query("insert into ".$_SESSION["business_id"]."_payment_details values('','$customer','$total_payment','$amount_cash','$amount_pos','$amount_trnf','$payment_type','$today') ");
+
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_details SET address= :new_address, phone1 = :new_phone1, phone2 = :new_phone2, email = :new_email WHERE id = :rec_id_update ");
+					                $update_query = $stmt->execute(['new_address' => $new_address, 'new_phone1' => $new_phone1, 'new_phone2' => $new_phone2, 'email' => $new_email, 'rec_id_update' => $rec_id_update ]);
+
+                                    $insert_payment = mysql_query("insert into ".$_SESSION["business_id"]."_payment_details values('','$customer','$total_payment','$amount_cash','$amount_pos','$amount_trnf','$payment_type','$today') ");
 									$q = mysql_query("update ".$_SESSION["business_id"]."_customers set total_credit= total_credit + '$total_payment' where ID='$customer' ");
                                     
                                     
@@ -248,31 +255,33 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                        		<tbody>
                       				
                        				<?php
-									$customer_curr = $_GET["customer"];
-									
-									$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_customers where ID='$customer_curr' ");
-									
-									if (mysql_num_rows($fetch)>0){
-										$get_rec = mysql_query("select * from ".$_SESSION["business_id"]."_customers where ID='$customer_curr' ");
-										
-										if (mysql_num_rows($get_rec)>0){
-											
-											$t_debt = mysql_result($get_rec, 0, "total_debt");
-											$t_credit = mysql_result($get_rec, 0, "total_credit");
-											$rem_credit = $t_credit - $t_debt;
-											
-											echo "<tr> <td>Total Debt</td> <td> ". number_format($t_debt)." </td> </tr>";
-											echo "<tr> <td>Total Credit</td> <td> ". number_format($t_credit)."  </td> </tr>";
-											
-											$credit_msg = "Remaining Credit in Account: ";
-											$debit_msg = "Final Balance Payable by Customer";
-											
-											if ($rem_credit > 0){ echo "<tr> <td>$credit_msg </td> <td> ". number_format($rem_credit)."  </td> </tr>"; }
-											else {echo "<tr> <td>$debit_msg </td> <td> ". number_format($rem_credit)." </td> </tr>";}
-											
-											
-										}
-									}
+                                        $customer_curr = $_GET["customer"];
+                                        
+                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE  ID= :customer_curr ");
+                                        $stmt->execute(['customer_curr' => $customer_curr]);
+
+                                        $rows = $stmt->rowCount();
+
+                                        if ($rows>0){
+                                            
+                                           // $get_rec = mysql_query("select * from ".$_SESSION["business_id"]."_customers where ID='$customer_curr' ");
+                                            
+                                            //if (mysql_num_rows($get_rec)>0){
+                                            $row = $stmt->fetch();
+                                            $t_debt = $row->total_debt;
+                                            $t_credit = $row->total_credit;
+                                            $rem_credit = $t_credit - $t_debt;
+                                            
+                                            echo "<tr> <td>Total Debt</td> <td> ". number_format($t_debt)." </td> </tr>";
+                                            echo "<tr> <td>Total Credit</td> <td> ". number_format($t_credit)."  </td> </tr>";
+                                            
+                                            $credit_msg = "Remaining Credit in Account: ";
+                                            $debit_msg = "Final Balance Payable by Customer";
+                                            
+                                            if ($rem_credit > 0){ echo "<tr> <td>$credit_msg </td> <td> ". number_format($rem_credit)."  </td> </tr>"; }
+                                            else {echo "<tr> <td>$debit_msg </td> <td> ". number_format($rem_credit)." </td> </tr>";}
+                                                
+                                        }
 								?>
                        		</tbody>
                        	</table>
@@ -319,35 +328,37 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                     <tbody>
                                             <?php
                                         
-                                            $fetch_query = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_payment_details where cust_id='$get_customer_id' order by `date` DESC ");
+                                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE cust_id = :get_customer_id ORDER BY `date` DESC ");
+                                                $stmt->execute(['get_customer_id' => $get_customer_id]);
                                             
-                                        if (mysql_num_rows($fetch_query)>0){
-                                                $sn=1;
-                                                $total_payment_sum = 0;
-                                                $total_cash_sum = 0;
-                                                $total_pos_sum = 0;
-                                                $total_transfer_sum = 0;
-                                                for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-                                                    $rec = mysql_fetch_array($fetch_query);
+                                                $rows = $stmt->rowCount();
+
+                                                if ($rows>0){
+                                                    $sn=1;
+                                                    $total_payment_sum = 0;
+                                                    $total_cash_sum = 0;
+                                                    $total_pos_sum = 0;
+                                                    $total_transfer_sum = 0;
+
+                                                    for($i=0; $i<$rows; $i++){
+
+                                                        $row = $stmt->fetch();
+
+                                                        $fetched_id = $row->id; 
+                                                        $trans_date = $row->date; 
+                                                        $total_amount = $row->amount;
+                                                        $cash = $row->cash; 
+                                                        $pos = $row->pos; 
+                                                        $transfer = $row->transfer;
+
+                                                        //sum payments
+                                                        $total_payment_sum += $total_amount;
+                                                        $total_cash_sum += $cash;
+                                                        $total_pos_sum += $pos;
+                                                        $total_transfer_sum += $transfer;
+
+                                                        $payment_type_fetch = strtoupper($row->payment_type);
                                                         
-                                                        $fetched_id = $rec["id"]; 
-                                                    
-                                                    $trans_date = $rec["date"]; 
-                                                    $total_amount = $rec["amount"];
-                                                    $cash = $rec["cash"]; 
-                                                    $pos = $rec["pos"]; 
-                                                    $transfer = $rec["transfer"];
-
-                                                    //sum payments
-                                                    $total_payment_sum += $total_amount;
-                                                    $total_cash_sum += $cash;
-                                                    $total_pos_sum += $pos;
-                                                    $total_transfer_sum += $transfer;
-
-                                                    $payment_type_fetch = strtoupper($rec["payment_type"]);
-                                                    
-                                                    
-                                                    
                                                     echo "<tr><td>$sn</td> <td>$fetched_id</td> <td>". number_format($total_amount) ."</td> <td>". number_format($cash)."</td><td>". number_format($pos)."</td> <td>". number_format($transfer)."</td> <td>$payment_type_fetch</td>
                                                      <td>$trans_date</td>
                                                     <td>
@@ -405,45 +416,50 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                     </thead>
                                     <tbody>
                                             <?php
+
+                                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_trans WHERE cid = :get_customer_id ORDER BY `balance` DESC ");
+                                                $stmt->execute(['get_customer_id' => $get_customer_id]);
+
+                                                $rows = $stmt->rowCount();
                                         
-                                            $fetch_query = mysql_query("select * from ".$_SESSION["business_id"]."_trans where cid='$get_customer_id' order by `balance` DESC ");
-                                            
-                                        if (mysql_num_rows($fetch_query)>0){
-                                                $sn=1;
-                                                
-                                                for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-                                                    $rec = mysql_fetch_array($fetch_query);
+                                                if ($rows>0){
+                                                        $sn=1;
                                                         
-                                                        $fetched_id = $rec["tid"]; $total_sale = $rec["total_sales"];
-                                                    
-                                                    $trans_date = $rec["date"]; 
-                                                    $mop = $rec["mop"];
-                                                    $amount_tendered = $rec["amount_tendered"]; 
-                                                    $change = $rec["change"];  $bal = $rec["balance"];
-                                                    
-                                                    //converting Means of Payment
-                                                    switch($mop){
-                                                        case "0": $mopText = "Loan";	break;
-                                                        case "0/1": $mopText = "Cash";  break;
-                                                        case "0/1/2": $mopText = "Cash/POS"; break;
-                                                        case "0/1/2/3": $mopText = "Cash/POS/Trnf"; break;
+                                                        for($i=0; $i<$rows; $i++){
+                                                            $row = $stmt->fetch();
+                                                                
+                                                            $fetched_id = $row->tid; 
+                                                            $total_sale = $row->total_sales;
+                                                            
+                                                            $trans_date = $row->date; 
+                                                            $mop = $row->mop;
+                                                            $amount_tendered = $row->amount_tendered; 
+                                                            $change = $row->change;  
+                                                            $bal = $row->balance;
+                                                            
+                                                            //converting Means of Payment
+                                                            switch($mop){
+                                                                case "0": $mopText = "Loan";	break;
+                                                                case "0/1": $mopText = "Cash";  break;
+                                                                case "0/1/2": $mopText = "Cash/POS"; break;
+                                                                case "0/1/2/3": $mopText = "Cash/POS/Trnf"; break;
 
-                                                        case "0/2": $mopText = "POS"; break;
-                                                        case "0/2/3": $mopText = "POS/Trnf"; break;
+                                                                case "0/2": $mopText = "POS"; break;
+                                                                case "0/2/3": $mopText = "POS/Trnf"; break;
 
-                                                        case "01/3": $mopText = "Cash/Trnf"; break;
-                                                        case "0/3": $mopText = "Trnf"; break;
-                                                    }
+                                                                case "01/3": $mopText = "Cash/Trnf"; break;
+                                                                case "0/3": $mopText = "Trnf"; break;
+                                                            }
 
-                                              
                                                     
-                                                    echo "<tr><td>$sn</td> <td>$fetched_id</td> <td>". number_format($total_sale) ."</td> <td>". number_format($amount_tendered)."</td> <td>". number_format($bal)."</td> <td>$mopText</td> <td>$trans_date</td>
-                                                    <td>
-                                                        <button type='button' class='btn bg-default waves-effect' onClick='full_receipt($fetched_id, $get_customer_id)'> 
-                                                                        <i class='material-icons'>assignment</i>
-                                                                        </button>
-                                                    </td>
-                                                    </tr>";
+                                                            
+                                                            echo "<tr><td>$sn</td> <td>$fetched_id</td> <td>". number_format($total_sale) ."</td> <td>". number_format($amount_tendered)."</td> <td>". number_format($bal)."</td> <td>$mopText</td> <td>$trans_date</td>
+                                                            <td>
+                                                                <button type='button' class='btn bg-default waves-effect' onClick='full_receipt($fetched_id, $get_customer_id)'> 
+                                                                                <i class='material-icons'>assignment</i>
+                                                                                </button>
+                                                            </td>
+                                                            </tr>";
                                                     $sn++;
                                                 }
                                             
