@@ -1,6 +1,9 @@
 <?php
 
 	require("../../inc/config.php");
+	//instanciate connection class
+	$Config = new Config;
+	$conn = $Config->connect();
 
 	$id = $_GET["cid"];
 

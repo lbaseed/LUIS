@@ -2,6 +2,10 @@
 ob_start(); 
 include '../../inc/config.php';
 
+//instanciate connection class
+$Config = new Config;
+$conn = $Config->connect();
+
     $order_id = $_POST["order"];
     $bid = $_SESSION["business_id"];
 

@@ -4,12 +4,17 @@ require("../../inc/config.php");
 
 	$type = $_GET["type"];
 	$id = $_GET["id"];
+	
+	
+	//instanciate connection class
+	$Config = new Config;
+	$conn = $Config->connect();
 
 	if ($type=="one"){
-
-		$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id = :id ");
-		$stmt->execute(['id' => $id]);
-
+		
+		$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id =? ");
+		$stmt->execute([$id]);
+		
     	$rows = $stmt->rowCount();
 		
 		$output = array();
@@ -22,6 +27,7 @@ require("../../inc/config.php");
 			
 			print(json_encode($output));
 		}
+		
 		
 	}elseif($type=="single"){
 

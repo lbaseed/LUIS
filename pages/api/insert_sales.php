@@ -1,6 +1,11 @@
 <?php
 require("../../inc/config.php"); 
 require("../../inc/php_functions.php");
+
+//instanciate connection class
+$Config = new Config;
+$conn = $Config->connect();
+
 $business_id = $_SESSION["business_id"];
 
 	if(isset($_POST['myData'])){

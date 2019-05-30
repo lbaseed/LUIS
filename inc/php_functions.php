@@ -3,9 +3,9 @@
     ob_start(); 
     //$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
 
-    //$_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
+    $_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
 
-    $_SESSION["home_link"] = "http://localhost:81/LUIS/pages/"; 
+    //$_SESSION["home_link"] = "http://localhost:81/LUIS/pages/"; 
 
 
     $Config = new Config;

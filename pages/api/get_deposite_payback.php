@@ -1,6 +1,11 @@
 <?php
 
 require("../../inc/config.php"); 
+
+//instanciate connection class
+$Config = new Config;
+$conn = $Config->connect();
+
 require("../../inc/php_functions.php");
 
 	$tid = $_GET["id"];
