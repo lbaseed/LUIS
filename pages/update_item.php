@@ -1,4 +1,4 @@
-<?php ob_start(); include("../inc/config.php"); include("../inc/php_functions.php");   
+<?php ob_start(); include("../inc/config.php"); include("../inc/php_functions.php");  include("../mpdf60/mpdf.php");
 protectPage(6);
 ?>
 <!DOCTYPE html>
@@ -239,6 +239,80 @@ protectPage(6);
                 
             </div>
             
+            <div class="row clearfix">
+              
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="card">
+             
+              <div class="header">
+                  <h2>
+                    Item Barcode
+                      <small></small>
+                  </h2>
+                  <ul class="header-dropdown m-r--5">
+                      <li class="dropdown">
+                          <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                              <i class="material-icons">more_vert</i>
+                          </a>
+                          <ul class="dropdown-menu pull-right">
+                              <li><a href="javascript:void(0);">Action</a></li>
+                              <li><a href="javascript:void(0);">Another action</a></li>
+                              <li><a href="javascript:void(0);">Something else here</a></li>
+                          </ul>
+                      </li>
+                  </ul>
+              </div>
+              <div class="body">
+              
+                 
+                 
+                 <?php
+                    
+                    if($_POST["generate"]){
+
+                    
+                        $content =  "<img src='barcode.gif' width=200 height=40 /> <br>".$Update_item_id.": ". $fetch_name." <br>N ".number_format($fetch_sale_price);
+
+                                $mpdf=new mPDF('c','A4-P');
+                                $html = "<table>";
+                               for ($i=0; $i<12; $i++){
+                                    $html .= "<tr>";
+                                    for ($j=0; $j<4; $j++){
+                                        $html .= "<td style='padding:20px'>".$content." &nbsp &nbsp </td>";
+                                    }
+                                    $html .= "</tr>";
+                               }
+                               $html .= "</table>";
+                               
+                                
+                                    
+                                    
+                                
+                                    $mpdf->WriteHTML($html);
+                                    $file = str_replace(" ","_",$fetch_name).".pdf";
+                                    $mpdf->Output("barcodes/".$file,'F');  
+                                    
+                                  echo "<div class='alert alert-success'>Bar code Generated Successfully. <a href='".$_SESSION["home_link"] ."/barcodes/".$file."' target='_blank'>Click Here to download</a></div>";
+                    
+                    }           
+
+                 ?>
+                 <form action="" method="post">
+                        <div class="icon-and-text-button-demo">
+									<button class="btn bg-green waves-effect" type="submit" name="generate" value="go">
+										<i class="material-icons">save</i> Generate Barcode
+									</button>
+                        </div>
+                </form>
+              </div>
+          </div>
+          
+      </div>
+      
+      
+      
+      
+  </div>
             
         </div>
     </section>
