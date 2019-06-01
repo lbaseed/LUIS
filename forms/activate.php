@@ -5,18 +5,22 @@ if(isset($_GET['auth']) and isset($_GET['veri'])){
 
     $email = mysql_real_escape_string(trim(str_rot13($_GET['auth'])));
     $verification = mysql_real_escape_string(trim($_GET['veri']));
-    
-    $query1 = mysql_query("SELECT * FROM businesses WHERE email='$email' AND verification_code = '$verification' AND verified_status = 'notverified'") or die(mysql_error());
+
+    $stmt = $conn->prepare("SELECT * FROM businesses WHERE email = :email AND verification_code = :verification AND verified_status = 'notverified' ");
+    $query1 = $stmt->execute(['email' => $email, 'verification' => $verification]);
+
+    $rows = $stmt->rowCount();
    
-    if (mysql_num_rows($query1) > 0) {
+    if ($rows > 0) {
         
-        $row = mysql_fetch_array($query1);
-        $business_id = $row["business_id"];
-        $business_name = $row["business_name"];
-        $business_address = $row["business_address"];
-        $customer_name = $row["customer_name"];
-        $customer_phone = $row["phone"];
-        $customer_email = $row["email"];
+        $row = $stmt->fetch();
+
+        $business_id = $row->business_id;
+        $business_name = $row->business_name;
+        $business_address = $row->business_address;
+        $customer_name = $row->customer_name;
+        $customer_phone = $row->phone;
+        $customer_email = $row->email;
 
 
         $username = $business_id."101";
@@ -27,13 +31,17 @@ if(isset($_GET['auth']) and isset($_GET['veri'])){
         $active_status = 'active';
         $recover_status = 'yes';
         $dt = date("Y-m-d");
+        $logo = $business_id."jpg";
 
         //Function That create tables for the particular business
         initializeTables($business_id);
 
-        $query = mysql_query("INSERT INTO " . $business_id . "_users VALUES('$username','$fullname','$phone','','$address','$password','$active_status', '$recover_status','9','','')");
-        $query2 = mysql_query("INSERT INTO " . $business_id . "_company_profile VALUES('','$business_name','$business_address','$customer_phone','','$customer_email','','".$business_id.".jpg','$dt')") or die(mysql_error());
-
+        $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_users (username, fullname, phone, email, address, password, active_status, recover_password, clrs, security_question, security_answer) VALUES (:username, :fullname, :phone, :email, :address, :password, :active_status, :recover_password, :clrs, :security_question, :security_answer) ");
+		$query = $stmt->execute(['username' => $username, 'fullname' => $fullName, 'phone' => $phone, 'email' => "", 'address' => $address, 'password' => $password, 'active_status' => $active_status, 'recover_password' => $recover_status, 'clrs' => 9, 'security_question' => "", 'security_answer' => "" ]);
+            
+        $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_company_profile (id, name, address, phone1, phone2, email, website, logo, date) VALUES (:id, :name, :address, :phone1, :phone2, :email, :website, :logo, :date) ");
+		$query2 = $stmt->execute(['id' => "", 'name' => $business_name, 'address' => $business_address, 'phone1' => $customer_phone, 'phone2' => "", 'email' => $customer_email, 'website' => "", 'logo' => $logo, 'date' => $dt ]);
+			
         updateBusinesses($business_id);
 
                     $from="no-reply@uis.com.ng";

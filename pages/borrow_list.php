@@ -125,30 +125,39 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                       	</thead>
                       	<tbody>
                       			<?php
-							$biz=$_SESSION["business_id"];
-								$fetch_query = mysql_query("select * from ".$biz."_customers join ".$biz."_borrow_trans on ".$biz."_customers.ID=".$biz."_borrow_trans.cid  where type='2' order by `date` DESC");
+                                    $biz=$_SESSION["business_id"];
+                                    
+                                    $stmt = $conn->prepare("SELECT * FROM ".$biz."_customers JOIN ".$biz."_borrow_trans ON ".$biz."_customers.ID=".$biz."_borrow_trans.cid  WHERE type='2' ORDER BY `date` DESC");
+                                    $stmt->execute();
+
+                                    $rows = $stmt->rowCount();
+                                    
+								    //$fetch_query = mysql_query("select * from ".$biz."_customers join ".$biz."_borrow_trans on ".$biz."_customers.ID=".$biz."_borrow_trans.cid  where type='2' order by `date` DESC");
 								
-							if (mysql_num_rows($fetch_query)>0){
-									$sn=1;
-								
-									for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-										$rec = mysql_fetch_array($fetch_query);
-											$fetched_transid = $rec["tid"];
-											$fetched_id = $rec["ID"]; $fetch_customer_name = $rec["full_name"];
-										
-                                        $fetch_phone = $rec["phone"]; $fetch_address = $rec["address"];
-                                        $fetch_credit = $rec["total_credit"];
-                                        $fetch_debt = $rec["total_debt"]; 
-                                        $customer_debt =$fetch_debt;
-										
-										echo "<tr><td><a href='borrow_info.php?customer=$fetched_id&trans=$fetched_transid'>$sn</a></td>  <td>$fetch_customer_name</td> <td>$fetch_address</td> <td>$fetch_phone</td> <td>
-										" .number_format($customer_debt)."
-										</td> </tr>";
-										$sn++;
-									}
-								
-								}
-							?>
+                                    if ($rows > 0){
+                                            $sn=1;
+                                        
+                                            for($i=0; $i<$rows; $i++){
+                                                $row = $stmt->fetch();
+
+                                                $fetched_transid = $row->tid;
+                                                $fetched_id = $row->ID; 
+                                                $fetch_customer_name = $row->full_name;
+                                                
+                                                $fetch_phone = $row->phone; 
+                                                $fetch_address = $row->address;
+                                                $fetch_credit = $row->total_credit;
+                                                $fetch_debt = $row->total_debt; 
+                                                $customer_debt =$fetch_debt;
+                                                
+                                                echo "<tr><td><a href='borrow_info.php?customer=$fetched_id&trans=$fetched_transid'>$sn</a></td>  <td>$fetch_customer_name</td> <td>$fetch_address</td> <td>$fetch_phone</td> <td>
+                                                " .number_format($customer_debt)."
+                                                </td> </tr>";
+                                                $sn++;
+                                            }
+                                        
+                                        }
+                                ?>
                       	</tbody>
                       	<tfoot>
                         		

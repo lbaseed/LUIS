@@ -76,9 +76,9 @@ $business_id = $_SESSION["business_id"];
                             
                     if(isset($_POST["submit"])){
                         
-                        $current_password = mysql_real_escape_string($_POST["current_password"]);
-                        $new_password = mysql_real_escape_string($_POST["new_password"]);
-                        $new_password_again = mysql_real_escape_string($_POST["new_password_again"]);
+                        $current_password = sanitize($_POST["current_password"]);
+                        $new_password = sanitize($_POST["new_password"]);
+                        $new_password_again = sanitize($_POST["new_password_again"]);
                         
                         if(!empty($current_password) && !empty($new_password) && !empty($new_password_again)){
                             
@@ -87,23 +87,27 @@ $business_id = $_SESSION["business_id"];
 
                                 if ($new_password !== $current_password) {
                                         
-                                        $username = $_SESSION["cur_user"];
+                                    $username = $_SESSION["cur_user"];
 
-                                        $query = mysql_query("SELECT * FROM ".$business_id."_users WHERE username ='$username' AND password = '$current_password' ");
+                                    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_users WHERE username = :username AND password = :current_password ");
+                                    $stmt->execute(['username' => $username, 'current_password' => $current_password]);
 
-                                        if(mysql_num_rows($query)>0){
-                                            
-                                            $query = mysql_query("UPDATE ".$business_id."_users SET password = '$new_password', recover_password = 'no' WHERE username ='$username' AND password = '$current_password' ");
+                                    $rows = $stmt->rowCount();
 
-                                            if ($query) {
-                                                echo "<div class='alert alert-success'>Password changed successfully</div>";
-                                            }else {
-                                                echo "<div class='alert alert-danger'>Unable to Update Password</div>";
-                                            }
+                                    if($rows>0){
+                                        
+                                        $stmt = $conn->prepare("UPDATE ".$business_id."_users SET password = :new_password, recover_password = 'no' WHERE username = :username AND password = :current_password ");
+                                        $query = $stmt->execute(['new_password' => $new_password, 'username' => $username, 'current_password' => $current_password]);
 
+                                        if ($query) {
+                                            echo "<div class='alert alert-success'>Password changed successfully</div>";
                                         }else {
-                                            echo "<div class='alert alert-danger'>Invalid Current Password</div>";
+                                            echo "<div class='alert alert-danger'>Unable to Update Password</div>";
                                         }
+
+                                    }else {
+                                        echo "<div class='alert alert-danger'>Invalid Current Password</div>";
+                                    }
 
                                 }else {
                                     echo "<div class='alert alert-danger'>New Password cannot be the same as Current Password</div>";

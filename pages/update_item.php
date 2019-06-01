@@ -110,10 +110,11 @@ protectPage(6);
 									
 									
 								if ($item_name and $item_cat and $cost_price and $sale_price){
-									
-									$query = mysql_query("update ".$_SESSION["business_id"]."_items set name='$item_name', cat_id='$item_cat', qty='$qty', cost_price='$cost_price', sale_price='$sale_price' where item_id='$item_id'");
-									
-									
+                                    
+                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_items SET name = :item_name, cat_id = :item_cat, qty= :qty, cost_price = :cost_price, sale_price = :sale_price WHERE item_id = :item_id ");
+                                    $query = $stmt->execute(['item_name' => $item_name, 'item_cat' => $item_cat, 'qty'=> $qty, 'cost_price' => $cost_price, 'sale_price' => $sale_price, 'item_id' => $item_id]);
+                                    
+									//$query = mysql_query("update ".$_SESSION["business_id"]."_items set name='$item_name', cat_id='$item_cat', qty='$qty', cost_price='$cost_price', sale_price='$sale_price' where item_id='$item_id'");
 									
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Item Updated Successfully</div>"; }
 									else { echo "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}
@@ -122,19 +123,26 @@ protectPage(6);
 							
 							{
 								
-								if(isset($_GET["item"])) {$Update_item_id = $_GET["item"];} else {$update_item_id="";}
+								if(isset($_GET["item"])) {$Update_item_id = $_GET["item"];} else {$Update_item_id="";}
 							
 								if(isset($Update_item_id)){
-									
-									$fetch_item_info = mysql_query("select * from ".$_SESSION["business_id"]."_items where item_id='$Update_item_id' and status=1");
-									
-									if(mysql_num_rows($fetch_item_info)>0){
+
+                                    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id = :Update_item_id AND status = 1 ");
+                                    $stmt->execute(['Update_item_id' => $Update_item_id]);
+                                    
+                                    $rows = $stmt->rowCount();
+
+									if($rows>0){
 										
-										$rec = mysql_fetch_array($fetch_item_info);
+										$row = $stmt->fetch();
 										
-										$fetch_name = $rec["name"];  $fetch_qty = $rec["qty"]; $fetch_cost_price = $rec["cost_price"];
-										$fetch_sale_price = $rec["sale_price"]; $fetch_cat = $rec["cat_id"]; $cat_name = getCategories($fetch_cat);
-										$fetch_bar_code = $rec["barcode"];
+                                        $fetch_name = $row->name;  
+                                        $fetch_qty = $row->qty; 
+                                        $fetch_cost_price = $row->cost_price;
+                                        $fetch_sale_price = $row->sale_price; 
+                                        $fetch_cat = $row->cat_id; 
+                                        $cat_name = getCategories($fetch_cat);
+										$fetch_bar_code = $row->barcode;
 										
 									}
 								}
@@ -144,10 +152,10 @@ protectPage(6);
 								
 								if(isset($_GET["del_item"])) {
 
-								$delete_item = $_GET["del_item"];
-
-									
-									$del_query = mysql_query("update ".$_SESSION["business_id"]."_items set status='0' where item_id='$delete_item' ");
+                                    $delete_item = $_GET["del_item"];
+                                        
+                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_items SET status = 0 WHERE item_id = :delete_item ");
+                                    $del_query = $stmt->execute(['delete_item' => $delete_item ]);
 									
 									if ($del_query) { echo "<div class='alert alert-success' role='alert'>Item Deleted Successfully</div>"; }
 									else { echo "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}

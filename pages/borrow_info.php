@@ -1,4 +1,8 @@
-<?php ob_start(); include("../inc/config.php"); include("../inc/php_functions.php");   
+<?php 
+//Ban gane query din line 126 ba
+ob_start(); 
+include("../inc/config.php"); 
+include("../inc/php_functions.php");   
 protectPage(5);
 if($_SESSION["clearance"]==6) {header("Location: index.php");}
 ?>
@@ -68,17 +72,26 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                        
                         <div class="header">
                             <h2>
-                              Customer Debts  :
-                              <?php 
-							  $customer_curr = $_GET["customer"];
-							  		$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_customers where ID='$customer_curr' ");
-									if (mysql_num_rows($fetch)>0){
-											
-											$name = mysql_result($fetch, 0, "full_name");
-											$address = mysql_result($fetch, 0, "address");
-											$phone = mysql_result($fetch, 0, "phone");
-											echo $name;
-									}else {echo "error";}
+                                Customer Debts  :
+                                <?php 
+                                    $customer_curr = $_GET["customer"];
+
+                                    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers where ID = :customer_curr ");
+                                    $stmt->execute(['customer_curr' => $customer_curr]);
+                                    
+                                    $rows = $stmt->rowCount();
+
+									if ($rows > 0){
+                                        $row = $stmt->fetch();
+                                        
+                                        $name = $row->full_name;
+                                        $address = $row->address;
+                                        $phone = $row->phone;
+                                        echo $name;
+                                        
+									}else {
+                                        echo "error";
+                                    }
 							
 							  ?>
                               <small><?php echo $phone?></small>
@@ -113,23 +126,43 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 									$items=$_SESSION["business_id"]."_items";
 									$customer_curr = $_GET["customer"];
 									$trans_id=$_GET["trans"];
-									
-									$q=mysql_query("select $borrow.*,$items.name from $borrow join $items on $borrow.item_id=$items.item_id where trans_id=$trans_id" );//fetch borrow join items
-									if(mysql_num_rows($q)){
-										for($i=0; $i<mysql_num_rows($q); $i++){
-											$row = mysql_fetch_array($q);
-											$total+=$row["borrow_price"];
-											$date=$row["date"];
+                                    
+                                    $stmt = $conn->prepare("SELECT $borrow.*,$items.name FROM $borrow JOIN $items ON $borrow.item_id=$items.item_id WHERE trans_id = :trans_id");
+                                    $stmt->execute(['trans_id' => $trans_id]);
+                                    
+                                    $rows = $stmt->rowCount();
+
+									//$q=mysql_query("select $borrow.*,$items.name from $borrow join $items on $borrow.item_id=$items.item_id where trans_id=$trans_id" );//fetch borrow join items
+                                    
+                                    if($rows > 0){
+
+										for($i=0; $i<$rows; $i++){
+
+                                            $row = $stmt->fetch();
+                                            
+											$total+=$row->borrow_price;
+                                            $date = $row->date;
+                                            
 										echo "<tr> <td>".$row["name"]."</td> <td> ". $row["borrow_price"]."</td><td>".$row["qty"]."</td> </tr>";
 										
 											
 											}
 									
 									echo "<tr><th>Total</th><td>".$total."</td></tr>";
-									echo "<tr><th>Date</th><td>".$date."</td></tr>";
-									$q2=mysql_query("select mop from ".$_SESSION["business_id"].'_borrow_trans'." where tid=$trans_id;");
-									if(mysql_num_rows($q2)>0){
-										$status=mysql_result($q2,0,"mop");
+                                    echo "<tr><th>Date</th><td>".$date."</td></tr>";
+                                    
+                                    $stmt = $conn->prepare("SELECT mop FROM ".$_SESSION["business_id"]."_borrow_trans WHERE tid = :trans_id;");
+                                    $stmt->execute(['trans_id' => $trans_id]);
+                                    
+                                    $rows = $stmt->rowCount();
+
+									//$q2=mysql_query("select mop from ".$_SESSION["business_id"].'_borrow_trans'." where tid=$trans_id;");
+                                    
+                                    if($rows > 0){
+
+                                        $row = $stmt->fetch();
+
+										$status = $row->mop;
 									
 										}
 									echo "<tr><th>Status</th><td><label id=status>".$status."</label></td></tr>";
@@ -195,7 +228,12 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                         
                                 
                                         <div class="icon-and-text-button-demo">
-                                        <?php $rec = mysql_query("select mop from ".$_SESSION["business_id"]."_borrow_trans where tid='$trans_id' and mop='sold'");
+                                        <?php 
+
+                                            $stmt = $conn->prepare("SELECT mop FROM ".$_SESSION["business_id"]."_borrow_trans WHERE tid= :trans_id AND mop='sold'");
+                                            $stmt->execute(['trans_id' => $trans_id]);
+
+                                            //$rec = mysql_query("select mop from ".$_SESSION["business_id"]."_borrow_trans where tid='$trans_id' and mop='sold'");
 											//if(mysql_num_rows($rec)>0){
 												?>
 												<button class="btn bg-green waves-effect" type="submit" name="get_receipt" id="get_receipt" value="go">

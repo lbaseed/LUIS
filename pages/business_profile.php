@@ -82,7 +82,10 @@ protectPage(7);
                                 $new_email = sanitize($_POST["new_email"]);
                                 $rec_id_update = sanitize($_POST["rec_id"]);
 
-                                $update_query = mysql_query("update ".$_SESSION["business_id"]."_company_profile set address='$new_address', phone1='$new_phone1', phone2='$new_phone2', email='$new_email' where id='$rec_id_update' ");
+                                $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_company_profile SET address= :new_address, phone1 = :new_phone1, phone2 = :new_phone2, email = :new_email WHERE id = :rec_id_update ");
+					            $update_query = $stmt->execute(['new_address' => $new_address, 'new_phone1' => $new_phone1, 'new_phone2' => $new_phone2, 'email' => $new_email, 'rec_id_update' => $rec_id_update ]);
+
+                                //$update_query = mysql_query("update ".$_SESSION["business_id"]."_company_profile set address='$new_address', phone1='$new_phone1', phone2='$new_phone2', email='$new_email' where id='$rec_id_update' ");
 
                                 if ($update_query) { echo "<div class='alert alert-success'>Record Updated Successfully</div>";}
                                 else { echo "<div class='alert alert-danger'>Record Updated Failed, Try again!</div>";}
@@ -95,29 +98,34 @@ protectPage(7);
                                 $rec_id_update = sanitize($_POST["rec_id"]);
                                $dstName = upload("logo",$_SESSION['business_id'],"logos",1024*200);
 
-                               $updateDB = mysql_query("update ".$_SESSION["business_id"]."_company_profile set logo='$dstName' where id='$rec_id_update' ");
+                                $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_company_profile SET logo = :dstName WHERE id = :rec_id_update ");
+					            $updateDB = $stmt->execute(['dstName' => $dstName, 'rec_id_update' => $rec_id_update ]);
+
+                                //$updateDB = mysql_query("update ".$_SESSION["business_id"]."_company_profile set logo='$dstName' where id='$rec_id_update' ");
                                 
                             }
 
-
                             $username = $_SESSION["cur_user"];
 
-                                $query = mysql_query("select * from ".$_SESSION["business_id"]."_company_profile");
-                                    
-                                    if(mysql_num_rows($query)>0){
-                                        
-                                        $rec = mysql_fetch_array($query);
-                                        $rec_id = $rec["id"];
-                                        $business_name = $rec["name"];
-                                        $website = $rec["website"];
-                                        $address = $rec["address"];
-                                        $phone1 = $rec["phone1"];
-                                        $phone2 = $rec["phone2"];
-                                        $email = $rec["email"];
-                                        $logo = $rec["logo"];
-                                        
-                                    }
+                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_company_profile");
+                                $stmt->execute();
                             
+                                $rows = $stmt->rowCount();
+
+                                if($rows > 0){
+                                    
+                                    $row = $stmt->fetch();
+                                    $rec_id = $row->id;
+                                    $business_name = $row->name;
+                                    $website = $row->website;
+                                    $address = $row->address;
+                                    $phone1 = $row->phone1;
+                                    $phone2 = $row->phone2;
+                                    $email = $row->email;
+                                    $logo = $row->logo;
+                                    
+                                }
+                        
                             ?>		       
 
                     <form action="" method="post" enctype="multipart/form-data">

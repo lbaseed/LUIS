@@ -82,8 +82,10 @@ protectPage(6);
 									
 									
 								if ($cat_name){
-									$query = mysql_query("insert into ".$_SESSION["business_id"]."_categories values('','$cat_name')");
-									
+
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_categories (id,name) VALUES (:id,:name) ");
+					                $query = $stmt->execute(['id' => "",'name' => $cat_name]);
+				
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Category added Successfully</div>";}
 									else { echo "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}
 								} else { echo "<div class='alert alert-danger' role='alert'>Fill all * fields</div>";}
@@ -149,21 +151,26 @@ protectPage(6);
                       	</thead>
                       	<tbody>
                       			<?php
-							
-								$fetch_query = mysql_query("select * from ".$_SESSION["business_id"]."_categories order by `id` DESC");
-								if (mysql_num_rows($fetch_query)>0){
-									$sn=1;
-									for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-										
-										$rec = mysql_fetch_array($fetch_query);
-											
-											$fetched_cat_id = $rec["id"]; $fetch_name = $rec["name"];
-										
-										
-										echo "<tr><td>$sn</td> <td><a href='?id=2&ref=$fetched_cat_id'>$fetch_name </a></td> </tr>";
-										$sn++;
-									}
-								}
+                            
+                                    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_categories  ORDER BY id DESC");
+                                    $stmt->execute();
+
+                                    $rows = $stmt->rowCount();
+
+                                    if ($rows>0){
+                                        $sn=1;
+                                        for($i=0; $i<$rows; $i++){
+                                            
+                                            $row = $stmt->fetch();
+                                                
+                                            $fetched_cat_id = $row->id; 
+                                            $fetch_name = $row->name;
+                                            
+                                            
+                                            echo "<tr><td>$sn</td> <td><a href='?id=2&ref=$fetched_cat_id'>$fetch_name </a></td> </tr>";
+                                            $sn++;
+                                        }
+                                    }
 							?>
                       	</tbody>
                       	

@@ -29,7 +29,8 @@ protectPage(3);
         <div class="container-fluid">
             
 
-            			<?php
+            <?php
+            //@kolerian Todo @description it doesnt require any changes
 					
 					if(isset($_GET["id"])) {$a = $_GET["id"];} else {$a = 1;}
 			

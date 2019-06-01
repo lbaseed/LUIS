@@ -124,11 +124,12 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 									$date = date("Y-m-d");
 									
 									
-								if ($full_name and $address and $pnum ){
-									
-									$query = mysql_query("insert into ".$_SESSION["business_id"]."_customers values('','$full_name','$address','$pnum','0','0','1')");
-									
-									$customer_id  = mysql_insert_id();
+								if ($full_name and $address and $pnum ){ 
+
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_customers (ID,full_name,address,phone,total_debt,total_credit,type) VALUES (:id, :cust_name, :cust_address, :cust_phone, :bal, :total_credit, :type) ");
+				                    $query = $stmt->execute(['id' => "", 'cust_name' => $full_name, 'cust_address' => $address, 'cust_phone' => $pnum, 'bal' => 0, 'total_credit' => 0, 'type' => 1 ]);
+				
+									$customer_id  = $conn->lastInsertId();
 									
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Customer Added Successfully [$customer_id]</div>"; }
 									else { echo "<div class='alert alert-danger' role='alert'>Operation Failed, try again</div>";}
@@ -218,31 +219,36 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                       		</tr>
                       	</thead>
                       	<tbody>
-                      			<?php
-							
-								$fetch_query = mysql_query("select * from ".$_SESSION["business_id"]."_customers order by `total_debt` DESC");
-								
-							if (mysql_num_rows($fetch_query)>0){
-									$sn=1;
-								
-									for($i=0; $i<mysql_num_rows($fetch_query); $i++){
-										$rec = mysql_fetch_array($fetch_query);
-											
-											$fetched_id = $rec["ID"]; $fetch_customer_name = $rec["full_name"];
-										
-                                        $fetch_phone = $rec["phone"]; $fetch_address = $rec["address"];
-                                        $fetch_credit = $rec["total_credit"];
-                                        $fetch_debt = $rec["total_debt"]; 
-                                        $customer_debt = $fetch_credit - $fetch_debt;
-										
-										echo "<tr><td>$sn</td> <td><a href='debt.php?customer=$fetched_id'>$fetched_id</a></td> <td>$fetch_customer_name</td> <td>$fetch_address</td> <td>$fetch_phone</td> <td>
-										" .number_format($customer_debt)."
-										</td> </tr>";
-										$sn++;
-									}
-								
-								}
-							?>
+                        <?php
+                            
+                            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers ORDER BY `total_debt` DESC ");
+                            $stmt->execute();
+
+                            $rows = $stmt->rowCount();
+
+                            if ($rows>0){
+                                $sn=1;
+                            
+                                for($i=0; $i<$rows; $i++){
+
+                                    $row = $stmt->fetch();
+                                        
+                                    $fetched_id = $row->ID; 
+                                    $fetch_customer_name = $row->full_name;
+                                    $fetch_phone = $row->phone; 
+                                    $fetch_address = $row->address;
+                                    $fetch_credit = $row->total_credit;
+                                    $fetch_debt = $row->total_debt; 
+                                    $customer_debt = $fetch_credit - $fetch_debt;
+                                    
+                                    echo "<tr><td>$sn</td> <td><a href='debt.php?customer=$fetched_id'>$fetched_id</a></td> <td>$fetch_customer_name</td> <td>$fetch_address</td> <td>$fetch_phone</td> <td>
+                                    " .number_format($customer_debt)."
+                                    </td> </tr>";
+                                    $sn++;
+                                }
+                                
+                                }
+                        ?>
                       	</tbody>
                       	<tfoot>
                         		
@@ -281,8 +287,6 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
     <!-- Autosize Plugin Js -->
     <script src="../plugins/autosize/autosize.js"></script>
 
-   
-    
     <!-- Moment Plugin Js -->
     <script src="../plugins/momentjs/moment.js"></script>
 

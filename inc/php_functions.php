@@ -1,7 +1,15 @@
-<?php ob_start(); 
-//$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
-$_SESSION["home_link"] = "http://localhost/Project_X/luis/pages/"; 
+<?php 
+    // error_reporting(0);
+    ob_start(); 
+    //$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
 
+    $_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
+
+    //$_SESSION["home_link"] = "http://localhost:81/LUIS/pages/"; 
+
+
+    $Config = new Config;
+    $conn = $Config->connect();
 
 function autologout($sec){		
 	if (isset( $_SESSION["ctime"]))
@@ -199,181 +207,272 @@ function panel_foot(){
 	
 //controls functions
 function list_categories(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_categories");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->id;
+            $name = $row->name;
+
+            echo "<option value='$id'>$name || [ $id ]</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_categories");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["id"];  $name = $rec["name"];  
-										 
-											echo "<option value='$id'>$name || [ $id ]</option>";
-
-										}
-									}
+    }
 }
 
 function getCategories($cat_id){
-	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_categories where id='$cat_id'");
-									if (mysql_num_rows($fetch)>0){
 
-										$name = mysql_result($fetch, 0, "name");
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_categories WHERE id = :cat_id ");
+	$stmt->execute(['cat_id' => $cat_id]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        $name = $row->name;
 										 
-										return $name;
-
+        return $name;
 										
-									}
+	}else{
+        return "Error Getting Record";
+    }
+
 }
 
 function list_items(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE status = 1 ORDER BY `name` ASC");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->item_id;
+            $name = $row->name;
+            $sale_price = $row->sale_price;
+
+            echo "<option value='$id'>$name : $sale_price</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_items where status=1 order by `name` ASC");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["item_id"];  $name = $rec["name"];  
-                                            $sale_price = $rec["sale_price"];
-											echo "<option value='$id'>$name : $sale_price</option>";
-
-										}
-									}
+    }
+	
 }
 
 function list_users(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_users ");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->username;
+            $name = $row->fullname;
+
+            echo "<option value='$id'>$name </option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_users ");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["username"];  $name = $rec["fullname"];  
-										 
-											echo "<option value='$id'>$name </option>";
-
-										}
-									}
+    }
+	
 }
 
 function list_customers(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE type='1' ORDER BY `ID` DESC ");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->ID;
+            $name = $row->full_name;
+
+            echo "<option value='$id'>$name [$id]</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_customers where type='1' order by `ID` DESC");
-									if (mysql_num_rows($fetch)>0){
-
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["ID"];  $name = $rec["full_name"];  
-										 
-											echo "<option value='$id'>$name [$id]</option>";
-
-										}
-									}
+    }
+	
 }
 
 function get_customer($id){
-	$name = "";
-	$query = mysql_query("select * from ".$_SESSION["business_id"]."_customers where ID='$id' ");
-	
-		if(mysql_num_rows($query)>0){
-			
-				$rec = mysql_fetch_array($query);
-					
-				$name = $rec["full_name"];
-		}
-	return $name;
-		
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE ID = :id ");
+	$stmt->execute(['id' => $id]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        $name = $row->full_name;
+										 
+        return $name;
+										
+	}else{
+        return "Error Getting Record";
+    }
+
 }
 
 function list_suppliers(){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers ORDER BY `ID` DESC ");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+
+            $id = $row->ID;
+            $name = $row->full_name;
+
+            echo "<option value='$id'>$name [$id]</option>";
+        }
 	
-	$fetch = mysql_query("select * from ".$_SESSION["business_id"]."_suppliers order by `ID` DESC");
-									if (mysql_num_rows($fetch)>0){
+    }
 
-										for ($i=0; $i<mysql_num_rows($fetch); $i++){
-											$rec = mysql_fetch_array($fetch);
-
-											$id = $rec["ID"];  $name = $rec["full_name"];  
-										 
-											echo "<option value='$id'>$name [$id]</option>";
-
-										}
-									}
 }
 
 function get_suppliers($id){
-	$name = "";
-	$query = mysql_query("select * from ".$_SESSION["business_id"]."_suppliers where ID='$id' ");
-	
-		if(mysql_num_rows($query)>0){
-			
-				$rec = mysql_fetch_array($query);
-					
-				$name = $rec["full_name"];
-		}
-	return $name;
-		
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers WHERE ID = :id ");
+	$stmt->execute(['id' => $id]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        $name = $row->full_name;
+										 
+        return $name;
+										
+	}else{
+        return "Error Getting Record";
+    }
+
 }
+
 function get_profit($tid){
-	$profit = 0;
-	$query = mysql_query("select * from ".$_SESSION["business_id"]."_sales where trans_id='$tid' ");
-	
-		if(mysql_num_rows($query)>0){
-			
-				for($i=0; $i<mysql_num_rows($query); $i++){
-					
-					$rec = mysql_fetch_array($query);
-					
-					$cost_price = $rec["cost_price"]; $sold_price = $rec["sold_price"];
-					$qty = $rec["qty"];
-					$profit += ($sold_price - $cost_price) * $qty;
-				}
-		}
-	return $profit;
+    
+    global $conn;
+    $profit = 0;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :tid ");
+	$stmt->execute(['itd' => $tid]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $cost_price = $row->cost_price; 
+        $sold_price = $row->sold_price;
+        $qty = $row->qty;
+        $profit += ($sold_price - $cost_price) * $qty;
+										 
+        return $profit;
+										
+	}else{
+        return "Error Getting Record";
+    }
+
 }
 
 function full_receipt_header(){
 	
-		
-										
-										$business_id = $_SESSION["business_id"];
-                                    $fetch = mysql_query("select * from ".$business_id."_company_profile ");
-                                    
-								if (mysql_num_rows($fetch)>0){
-									
-									$company_name = mysql_result($fetch, 0, "name"); $address = mysql_result($fetch, 0, "address");
-									$phone1 = mysql_result($fetch, 0, "phone1"); $phone2 = mysql_result($fetch, 0, "phone2");
-									$email = mysql_result($fetch, 0, "email");  $logo = mysql_result($fetch, 0, "logo");
-								}
-								?>
-                          			<table>
-                          				<tr>
-                          					<td>
-                          						<div style="text-align: left"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
-                          					</td>
-                          					
-											<td width="600">
-												<div style="text-align: center">
-												<label id="bus_name"><?php echo $company_name?></label><br>
-												<label id="bus_address"><?php echo $address?></label><br>
-												<label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label><br>
-												<label id="bus_email"><?php echo $email?></label>
-												</div>
-											</td>
-                          				</tr>
-                          			</table>
-                          			<div class="clearfix"></div>
-                           			
-                           			
-				<?php
+	global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_company_profile  ");
+	$stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        $row = $stmt->fetch();
+
+        $company_name = $row->name; 
+        $address = $row->address;
+        $phone1 = $row->phone1; 
+        $phone2 = $row->phone2;
+        $email = $row->email;  
+        $logo = $row->logo;
+    }
+    ?>
+    <table>
+        <tr>
+            <td>
+                <div style="text-align: left"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
+            </td>
+            
+            <td width="600">
+                <div style="text-align: center">
+                <label id="bus_name"><?php echo $company_name?></label><br>
+                <label id="bus_address"><?php echo $address?></label><br>
+                <label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label><br>
+                <label id="bus_email"><?php echo $email?></label>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div class="clearfix"></div>
+        
+    <?php
 }
 
 function logout(){
-	$home_link = $_SESSION["home_link"];
+    $home_link = $_SESSION["home_link"];
+    
 	$_SESSION["cur_user"] = "";
 	$_SESSION["fullName"] = "";
 	$_SESSION["clearance"] = "";
@@ -383,27 +482,44 @@ function logout(){
 }
 
 function getTableData($tbl, $identifier, $parameter, $returnColumn){
-	
-	$query = mysql_query("select * from $tbl where $identifier=$parameter");
-	
-	if(mysql_num_rows($query)>0){
-		
-		$result = mysql_result($query, 0, "$returnColumn");
-		
-		return $result;
-	}
-	
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM $tbl WHERE $identifier = :parameter ");
+	$stmt->execute(['parameter' => $parameter]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $result = $row->$returnColumn; 
+										 
+        return $result;
+										
+	}else{
+        return "Error Getting Record";
+    }
+
 }
 
 function login($sys_user, $pass, $bid)	{
-        
-   
-		$q = mysql_query("SELECT * FROM " . $bid ."_users WHERE username='$sys_user' and active_status='active' ");
-    if($q){
 
-		if (@mysql_num_rows($q)>0)
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM " . $bid ."_users WHERE username= :sys_user AND active_status='active' ");
+	$query = $stmt->execute(['sys_user' => $sys_user]);
+        
+    if($query){
+
+        $rows = $stmt->rowCount();
+        $row = $stmt->fetch();
+
+		if ($rows > 0)
 		{
-            $fpass = mysql_result($q, 0, "password");
+            $fpass = $row->password;
             //$status = mysql_result($q, 0, "status");
 			
 			if ($pass==$fpass)
@@ -414,9 +530,9 @@ function login($sys_user, $pass, $bid)	{
                // }
 				//login successful
 				
-				$_SESSION["cur_user"] = mysql_result($q, 0, "username");
-				$_SESSION["clearance"] = mysql_result($q, 0, "clrs");
-				$_SESSION["fullname"] = mysql_result($q, 0, "fullname");
+				$_SESSION["cur_user"] = $row->username;
+				$_SESSION["clearance"] = $row->clrs;
+				$_SESSION["fullname"] = $row->fullname;
 				$_SESSION["business_id"] = $bid;
 				
 				header("Location:index.php"); 
@@ -707,65 +823,78 @@ function general_order_receipt(){
 function general_thermal_receipt(){
 
     ?>
-             <!-- Small Size -->
-             <div class="modal fade" id="smallModal" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-sm" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="smallModalLabel">Thermal Receipt</h4>
+    <!-- Small Size -->
+    <div class="modal fade" id="smallModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h4 class="modal-title" id="smallModalLabel">Thermal Receipt</h4>
+            </div>
+            <div class="modal-body">
+                <div id="printThis" style="font-size:12px">
+                    <?php
+
+                        global $conn;
+
+                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_company_profile ");
+                        $stmt->execute();
+
+                        $rows = $stmt->rowCount();
+                        
+                        if ($rows>0)
+                        {
+                            
+                            $row = $stmt->fetch();
+                            
+                            $company_name = $row->name;
+                            $address = $row->address;
+                            $phone1 = $row->phone1; 
+                            $phone2 = $row->phone2;
+                            $email = $row->email;  
+                            $logo = $row->logo;
+                                                            
+                        }
+                        
+                    ?>
+                        <div style="text-align: center"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
+                        <div style="text-align: center;">
+                            <label id="bus_name"><?php echo $company_name?></label><br>
+                            <label id="bus_address"><?php echo $address?></label><br>
+                            <label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label>
                         </div>
-                        <div class="modal-body">
-                           	<div id="printThis" style="font-size:12px">
-                          			<?php
-										
-										$business_id = $_SESSION["business_id"];
-									$fetch = mysql_query("select * from ".$business_id."_company_profile ");
-								if (mysql_num_rows($fetch)>0){
-									
-									$company_name = mysql_result($fetch, 0, "name"); $address = mysql_result($fetch, 0, "address");
-									$phone1 = mysql_result($fetch, 0, "phone1"); $phone2 = mysql_result($fetch, 0, "phone2");
-									$email = mysql_result($fetch, 0, "email");  $logo = mysql_result($fetch, 0, "logo");
-								}
-								?>
-                           			<div style="text-align: center"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
-                           			<div style="text-align: center;">
-										<label id="bus_name"><?php echo $company_name?></label><br>
-										<label id="bus_address"><?php echo $address?></label><br>
-										<label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label>
-									</div>
-                           			<div style="float: left">Ref: <label  id="modal_trans_ref"></label></div> 
-                           			<div class="pull-right" ><label id="modal_trans_date"></label></div><br>
-                           			
-									
-                           				<table id="modal_items_list" class="table" >
-                           				<thead>
-                           					<tr><th>Qty</th> <th>Item</th> <th width="25%">Sub</th></tr>
-                           					
-                           					</thead>
-                           					<tbody>
-                           						
-                           					</tbody>
-                           				</table>
-                           			
-                           			<div style="text-align: center">
-										<label>Total Sales: </label> <label id="modal_total_label"> #### </label><br>
-										<label>Amount Tendered: </label> <label id="modal_amount_tendered"> ####</label><br>
-										<label>Change: </label> <label id="modal_change"> ####</label>
-										
-									</div>
-                          			<div><label id="modal_footer">cashier: <?php echo $_SESSION["cur_user"];?>,</label><label id="modal_footer_date"> </label></div>
-                           	</div>
+                        <div style="float: left">Ref: <label  id="modal_trans_ref"></label></div> 
+                        <div class="pull-right" ><label id="modal_trans_date"></label></div><br>
+                        
+                        
+                            <table id="modal_items_list" class="table" >
+                            <thead>
+                                <tr><th>Qty</th> <th>Item</th> <th width="25%">Sub</th></tr>
+                                
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        
+                        <div style="text-align: center">
+                            <label>Total Sales: </label> <label id="modal_total_label"> #### </label><br>
+                            <label>Amount Tendered: </label> <label id="modal_amount_tendered"> ####</label><br>
+                            <label>Change: </label> <label id="modal_change"> ####</label>
+                            
                         </div>
-                        <div class="modal-footer">
-                           	
-                            <button type="button" class="btn btn-link waves-effect" onClick="printDiv('printThis')">Print Receipt</button>
-                            <button type="button" class="btn btn-link waves-effect" id="modal_close" data-dismiss="modal">CLOSE</button>
-                        </div>
-                    </div>
+                        <div><label id="modal_footer">cashier: <?php echo $_SESSION["cur_user"];?>,</label><label id="modal_footer_date"> </label></div>
                 </div>
             </div>
-            
-            <!-- ======  end of small modal ========-->
+            <div class="modal-footer">
+                
+                <button type="button" class="btn btn-link waves-effect" onClick="printDiv('printThis')">Print Receipt</button>
+                <button type="button" class="btn btn-link waves-effect" id="modal_close" data-dismiss="modal">CLOSE</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======  end of small modal ========-->
             
     <?php
 }
@@ -781,20 +910,31 @@ function deposite_payback_receipt(){
                         <div class="modal-body">
                            	<div id="printThis" style="font-size:12px">
                           			<?php
-										
-										$business_id = $_SESSION["business_id"];
-									$fetch = mysql_query("select * from ".$business_id."_company_profile ");
-								if (mysql_num_rows($fetch)>0){
-									
-									$company_name = mysql_result($fetch, 0, "name"); $address = mysql_result($fetch, 0, "address");
-									$phone1 = mysql_result($fetch, 0, "phone1"); $phone2 = mysql_result($fetch, 0, "phone2");
-									$email = mysql_result($fetch, 0, "email");  $logo = mysql_result($fetch, 0, "logo");
-								}
+                                        global $conn;
+
+                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_company_profile ");
+                                        $stmt->execute();
+                
+                                        $rows = $stmt->rowCount();
+                                        
+                                        if ($rows>0)
+                                        {
+                                            
+                                            $row = $stmt->fetch();
+                                            
+                                            $company_name = $row->name;
+                                            $address = $row->address;
+                                            $phone1 = $row->phone1; 
+                                            $phone2 = $row->phone2;
+                                            $email = $row->email;  
+                                            $logo = $row->logo;
+                                                                            
+                                        }
 								?>
                            			<div style="text-align: center"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
                            			<div style="text-align: center;">
-										<label id="bus_name"><?php echo $company_name?></label><br>
-										<label id="bus_address"><?php echo $address?></label><br>
+										<label id="bus_name"><?php echo $company_name; ?></label><br>
+										<label id="bus_address"><?php echo $address; ?></label><br>
 										<label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label>
 									</div>
                            			<div style="float: left">Ref: <label  id="modal_depo_ref"></label></div> 
@@ -840,430 +980,503 @@ function message($type, $bg, $text){
 }
 
 function dailySales(){
-	
-	$today = date("Y-m-d");
-	
-		$query = mysql_query("select * from ".$_SESSION["business_id"]."_st_sales where date='$today'");
+
+    $today = date("Y-m-d");
 	$sales = 0;
-		if(@mysql_num_rows($query)>0){
-			$sales = mysql_result($query, 0, "amount");
-			
-		}
-	return $sales;
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_st_sales WHERE date = :today ");
+    $stmt->execute(['today' => $today]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $sales = $row->amount;
+        return $sales;
+                                        
+    }else {
+        return "Error Getting Record";
+    }
+	
 }
 
 function dailyQty(){
 	
-	$today = date("Y-m-d");
-	
-		$query = mysql_query("select * from ".$_SESSION["business_id"]."_st_sales where date='$today'");
-	$qty = 0;
-		if(@mysql_num_rows($query)>0){
-			$qty = mysql_result($query, 0, "qty");
-			
-		}
-	return $qty;
+    $today = date("Y-m-d");
+    $qty = 0;
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_st_sales WHERE date = :today ");
+    $stmt->execute(['today' => $today]);
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $qty = $row->qty;
+        return $qty;
+                                        
+    }else {
+        return "Error Getting Record";
+    }
 	
 }
 
 function monthlySales(){
 	
-	$year = date("Y"); $month = date("m");
-	
-		$query = mysql_query("select * from ".$_SESSION["business_id"]."_st_sales where MONTH(date)='$month' and YEAR(date)='$year'");
-	
-	$totalSales = 0;
-	
-		if(mysql_num_rows($query)>0){
-			
-			for ($i=0; $i<mysql_num_rows($query); $i++){
-				
-				$sales = mysql_result($query, $i, "amount");
-			}
-			
-			$totalSales+=$sales;
-			
-		}else {$totalSales = 0;}
+    $year = date("Y"); 
+    $month = date("m");
+    $totalSales = 0;
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_st_sales WHERE MONTH(date)= :month AND YEAR(date)= :year");
+    $stmt->execute(['month' => $month, 'year' => $year]);
+
+    $rows = $stmt->rowCount();
+    //BUG Discuss with CEO bekamata $totalSales nachikin for loop ba kamar yadda yake da a nasa
+    if ($rows>0)
+    {
+        for ($i=0; $i < $rows; $i++) { 
+
+            $row = $stmt->fetch();
+            $sales = $row->amount;
+            
+            $totalSales+=$sales;
+        }
+        
+    }else {
+        $totalSales = 0;
+    }
 	
 	return $totalSales;
 }
 
 function totalItems(){
 	
-	
-		$query = mysql_query("select * from ".$_SESSION["business_id"]."_items ");
-	
+	global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items ");
+    $stmt->execute();
+
+    $rows = $stmt->rowCount();
 		
-	return mysql_num_rows($query);
+	return $rows;
 	
 }
 
-
-function getLastBusinessID(){
-	
-    $query = mysql_query("SELECT * FROM system_mst");
-
-    if (mysql_num_rows($query) > 0){
-
-        $row = mysql_fetch_array($query);
-
-        $last_business_id = $row["last_business_id"];
-        $new_business_id = $last_business_id + 1;
-
-        mysql_query("UPDATE system_mst SET last_business_id = '$new_business_id'");
-        return $last_business_id;
-
-    }
-}
 
 function getTotalSalesType($type, $date1, $date2){
 
     $total = 0;
-    $bid = $_SESSION["business_id"]; 
-    $q = mysql_query("select * from ".$bid."_payment_analysis where date between '$date1' and '$date2' and status <> 'returned'");
+    global $conn;
 
-    if(mysql_num_rows($q)>0){
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE date BETWEEN :date1 AND :date2 AND status <> 'returned' ");
+    $stmt->execute(['date1' => $date1, 'date2' => $date2]);
 
-            while($row = mysql_fetch_array($q)){
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        while($row = $stmt->fetch()){
 
-                switch ($type){
+            switch ($type){
 
-                    case 1: $total += $row["cash"]; break;
-                    case 2: $total += $row["pos"]; break;
-                    case 3: $total += $row["transfer"]; break;
-                    case 4: $total += $row["amount"]; break;
+                case 1: 
+                    $total += $row->cash; 
+                break;
+                case 2: 
+                    $total += $row->pos;
+                break;
+                case 3: 
+                    $total += $row->transfer; 
+                break;
+                case 4: 
+                    $total += $row->amount; 
+                break;
 
-                }
-                
             }
 
+        }
     }
 
     return $total;
 }
 
 function initializeTables($business_id){
-    $audit_trail = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_audit_trail` (
-    `id` bigint(11) NOT NULL AUTO_INCREMENT,
-    `operation` varchar(50) NOT NULL,
-    `date` date NOT NULL,
-    `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `user` int(11) NOT NULL,
-    `activity` text NOT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-  ");
-  
-  $auto_inc_audit_trail = mysql_query("ALTER TABLE `".$business_id."_audit_trail` AUTO_INCREMENT=100 ");
-
-	$business_profile = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_business_profile` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `startDate` date NOT NULL,
-    `endDate` date NOT NULL,
-    `capital` double NOT NULL,
-    `turnover` double NOT NULL,
-    `profit` double NOT NULL,
-    `user` int(11) NOT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
     
-    $auto_inc_business_profile = mysql_query("ALTER TABLE `".$business_id."_business_profile` AUTO_INCREMENT=100 ");
+    $audit_trail = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_audit_trail` (
+            `id` bigint(11) NOT NULL AUTO_INCREMENT,
+            `operation` varchar(50) NOT NULL,
+            `date` date NOT NULL,
+            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `user` int(11) NOT NULL,
+            `activity` text NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+      
+    ");
 
-	$categories = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_categories` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` text NOT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
+    $auto_inc_audit_trail = $conn->query("ALTER TABLE `".$business_id."_audit_trail` AUTO_INCREMENT=100 ");
+
+    $borrow = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_borrow` (
+            `borrow_id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `item_id` int(11) NOT NULL,
+            `qty` double NOT NULL,
+            `cost_price` double NOT NULL,
+            `borrow_price` double NOT NULL,
+            `sub_total` double NOT NULL,
+            `trans_id` int(11) NOT NULL,
+            `date` date NOT NULL,
+            `cashier` varchar(200) NOT NULL,
+            PRIMARY KEY (`borrow_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
     
-    $auto_inc_cat = mysql_query("ALTER TABLE `".$business_id."_categories` AUTO_INCREMENT=100 ");
-
-	$company_profile = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_company_profile` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` text NOT NULL,
-    `address` text NOT NULL,
-    `phone1` varchar(30) NOT NULL,
-    `phone2` varchar(30) NOT NULL,
-    `email` text NOT NULL,
-    `website` text NOT NULL,
-    `logo` text NOT NULL,
-    `date` date NOT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
+    $auto_increment_borrow = $conn->query("ALTER TABLE `".$business_id."_borrow` AUTO_INCREMENT=100");
 	
-	$customers = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_customers` (
-    `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-    `full_name` text,
-    `address` text,
-    `phone` varchar(30) DEFAULT NULL,
-    `total_debt` double NOT NULL,
-    `total_credit` double NOT NULL,
-    `type` int(11) NOT NULL,
-    PRIMARY KEY (`ID`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
-  
-    $auto_inc_customers = mysql_query("ALTER TABLE `".$business_id."_customers` AUTO_INCREMENT=100 ");
-
-    $suppliers = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_suppliers` (
-    `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-    `full_name` text,
-    `address` text,
-    `phone` varchar(30) DEFAULT NULL,
-    `total_debt` double NOT NULL,
-    `total_credit` double NOT NULL,
-    PRIMARY KEY (`ID`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
-  
-    $auto_inc_suppliers = mysql_query("ALTER TABLE `".$business_id."_suppliers` AUTO_INCREMENT=100 ");
-
-  $daily_sales = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_daily_sales` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `date` date NOT NULL,
-    `category_daily_total` double NOT NULL,
-    `category` int(11) NOT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-  ");
-  
-  $auto_inc_daily_sales = mysql_query("ALTER TABLE `".$business_id."_daily_sales` AUTO_INCREMENT=100 ");
-
-	$items = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_items` (
-    `item_id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `name` text NOT NULL,
-    `qty` double NOT NULL,
-    `cost_price` double NOT NULL,
-    `sale_price` double NOT NULL,
-    `cat_id` int(11) NOT NULL,
-    `med_id` int(11) NOT NULL,
-    `date` date NOT NULL,
-    `status` int(11) NOT NULL,
-    `barcode` varchar(200) NOT NULL,
-    PRIMARY KEY (`item_id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+	$borrow_trans = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_borrow_trans` (
+            `tid` bigint(20) NOT NULL,
+            `total_sales` double NOT NULL,
+            `date` date NOT NULL,
+            `mop` varchar(11) NOT NULL,
+            `amount_tendered` double NOT NULL,
+            `change` int(11) NOT NULL,
+            `balance` double NOT NULL,
+            `cid` int(11) NOT NULL,
+            `cashier` varchar(200) NOT NULL,
+            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`tid`);
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
     
-    $auto_incerement_items = mysql_query("ALTER TABLE `".$business_id."_items` AUTO_INCREMENT=100 ");
-
-	$items_serial = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_items_serials` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `item` int(11) NOT NULL,
-    `serialNumber` varchar(200) NOT NULL,
-    `sales_id` bigint(20) NOT NULL,
-    `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
-
-    $auto_inc_items_serial = mysql_query("ALTER TABLE `".$business_id."_items_serial` AUTO_INCREMENT=100 ");
-
-	$order_details = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_order_details` (
-    `oid` bigint(20) NOT NULL AUTO_INCREMENT,
-    `item_id` varchar(100) NOT NULL,
-    `qty` double NOT NULL,
-    `price` double NOT NULL,
-    `value` double NOT NULL,
-    `ref` varchar(100) NOT NULL,
-    `qtySupplied` double NOT NULL,
-    `priceSupplied` double NOT NULL,
-    `valueOfSupplied` double NOT NULL,
-    `date`date NOT Null,
-    PRIMARY KEY (`oid`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-  ");
-
-  $auto_inc_order_details = mysql_query("ALTER TABLE `".$business_id."_order_details` AUTO_INCREMENT=100 ");
-
-  $payment_analysis = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_payment_analysis` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `date` datetime NOT NULL,
-    `tid` varchar(200) NOT NULL,
-    `amount` double NOT NULL,
-    `cash` double NOT NULL,
-    `pos` double NOT NULL,
-    `transfer` double NOT NULL,
-    `balance` double NOT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-  ");
-
-  $auto_inc_payment_analysis = mysql_query("ALTER TABLE `".$business_id."_payment_analysis` AUTO_INCREMENT=100 ");
-
-  $payment_details = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_payment_details` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `cust_id` bigint(11) NOT NULL,
-    `amount` double NOT NULL,
-    `cash` double NOT NULL,
-    `pos` double NOT NULL,
-    `transfer` double NOT NULL,
-    `payment_type` varchar(20),
-    `date` date NOT NULL,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-  ");
-
-  $auto_inc_payment_details = mysql_query("ALTER TABLE `".$business_id."_payment_details` AUTO_INCREMENT=100 ");
-
-	$placed_order = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_placed_order` (
-    `ref` int(11) NOT NULL AUTO_INCREMENT,
-    `supplier` varchar(100) NOT NULL,
-    `valueOrdered` double NOT NULL,
-    `dateOrdered` date NOT NULL,
-    `dateSupplied` date NOT NULL,
-    `valueSupplied` double NOT NULL,
-    `status` varchar(50) NOT NULL,
-    PRIMARY KEY (`ref`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    $business_profile = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_business_profile` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `startDate` date NOT NULL,
+            `endDate` date NOT NULL,
+            `capital` double NOT NULL,
+            `turnover` double NOT NULL,
+            `profit` double NOT NULL,
+            `user` int(11) NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
 
-    $auto_inc_placed_order = mysql_query("ALTER TABLE `".$business_id."_placed_order` AUTO_INCREMENT=100 ");
+    $auto_inc_business_profile = $conn->query("ALTER TABLE `".$business_id."_business_profile` AUTO_INCREMENT=100 ");
 
-	$sales = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_sales` (
-    `sales_id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `item_id` int(11) NOT NULL,
-    `qty` double NOT NULL,
-    `cost_price` double NOT NULL,
-    `sold_price` double NOT NULL,
-    `sub_total` double NOT NULL,
-    `trans_id` int(11) NOT NULL,
-    `date` date NOT NULL,
-    `cashier` varchar(200) NOT NULL,
-    `status` varchar(20) NOT NULL
-    PRIMARY KEY (`sales_id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
-    $auto_inc_sales = mysql_query("ALTER TABLE `".$business_id."_sales` AUTO_INCREMENT=100 ");
+    $categories = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_categories` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `name` text NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
 
-	$st_items = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_st_items` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `item` int(11) NOT NULL,
-    `qty` double NOT NULL,
-    `date` date NOT NULL,
-    `user` int(11) NOT NULL,
-    `timeStamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
+    $auto_inc_cat = $conn->query("ALTER TABLE `".$business_id."_categories` AUTO_INCREMENT=100 ");
 
-    $auto_inc_st_items = mysql_query("ALTER TABLE `".$business_id."_st_items` AUTO_INCREMENT=100 ");
+    $company_profile = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_company_profile` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `name` text NOT NULL,
+            `address` text NOT NULL,
+            `phone1` varchar(30) NOT NULL,
+            `phone2` varchar(30) NOT NULL,
+            `email` text NOT NULL,
+            `website` text NOT NULL,
+            `logo` text NOT NULL,
+            `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
 
-	$st_sales = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_st_sales` (
-    `id` bigint(11) NOT NULL AUTO_INCREMENT,
-    `amount` double NOT NULL,
-    `qty` double NOT NULL,
-    `date` date NOT NULL,
-    `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
+    $customers = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_customers` (
+            `ID` int(11) NOT NULL AUTO_INCREMENT,
+            `full_name` text,
+            `address` text,
+            `phone` varchar(30) DEFAULT NULL,
+            `total_debt` double NOT NULL,
+            `total_credit` double NOT NULL,
+            `type` int(11) NOT NULL,
+            PRIMARY KEY (`ID`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
 
-    $auto_incerement_st_sales = mysql_query("ALTER TABLE `".$business_id."_st_sales` AUTO_INCREMENT=100 ");
+    $auto_inc_customers = $conn->query("ALTER TABLE `".$business_id."_customers` AUTO_INCREMENT=100 ");
 
-	$trans = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_trans` (
-    `tid` bigint(20) NOT NULL,
-    `total_sales` double NOT NULL,
-    `date` date NOT NULL,
-    `mop` varchar(11) NOT NULL,
-    `amount_tendered` double NOT NULL,
-    `change` int(11) NOT NULL,
-    `balance` double NOT NULL,
-    `cid` int(11) NOT NULL,
-    `cashier` varchar(200) NOT NULL,
-    `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `status` varchar(20) NOT NULL,
-    PRIMARY KEY (`tid`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-	");
+    $daily_sales = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_daily_sales` (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `date` date NOT NULL,
+            `category_daily_total` double NOT NULL,
+            `category` int(11) NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
 
-	$users = mysql_query("
-    CREATE TABLE IF NOT EXISTS `".$business_id."_users` (
-    `username` int(11) NOT NULL AUTO_INCREMENT,
-    `fullname` text NOT NULL,
-    `phone` varchar(15) NOT NULL,
-    `email` varchar(200) NOT NULL,
-    `address` varchar(200) NOT NULL,
-    `password` varchar(64) NOT NULL,
-    `active_status` varchar(15) NOT NULL DEFAULT 'notactive',
-    `recover_password` varchar(15) NOT NULL DEFAULT 'yes',
-    `clrs` int(11) NOT NULL,
-    `security_question` text NOT NULL,
-    `security_answer` text NOT NULL,
-    PRIMARY KEY (`username`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-  ");
+    $auto_inc_daily_sales = $conn->query("ALTER TABLE `".$business_id."_daily_sales` AUTO_INCREMENT=100 ");
 
-  $suppliers = mysql_query("
-  CREATE TABLE IF NOT EXISTS `".$business_id."_suppliers` (
-    `ID` bigint(20) NOT NULL AUTO_INCREMENT,
-    `full_name` text,
-    `address` text,
-    `phone` varchar(30) DEFAULT NULL,
-    `total_debt` double NOT NULL,
-    `total_credit` double NOT NULL,
-    PRIMARY KEY (`ID`)
-  ) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=latin1;
-  ");
+    $items = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_items` (
+            `item_id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `name` text NOT NULL,
+            `qty` double NOT NULL,
+            `cost_price` double NOT NULL,
+            `sale_price` double NOT NULL,
+            `cat_id` int(11) NOT NULL,
+            `med_id` int(11) NOT NULL,
+            `date` date NOT NULL,
+            `status` int(11) NOT NULL,
+            `barcode` varchar(200) NOT NULL,
+            PRIMARY KEY (`item_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
 
-  $auto_incerement_suppliers = mysql_query("ALTER TABLE `".$business_id."_suppliers` AUTO_INCREMENT=100");
+    $auto_incerement_items = $conn->query("ALTER TABLE `".$business_id."_items` AUTO_INCREMENT=100 ");
 
-  $borrow = mysql_query("
-  CREATE TABLE `".$business_id."_borrow` (
-    `borrow_id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `item_id` int(11) NOT NULL,
-    `qty` double NOT NULL,
-    `cost_price` double NOT NULL,
-    `borrow_price` double NOT NULL,
-    `sub_total` double NOT NULL,
-    `trans_id` int(11) NOT NULL,
-    `date` date NOT NULL,
-    `cashier` varchar(200) NOT NULL,
-    PRIMARY KEY (`borrow_id`)
-   ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
-   ");
-   $auto_increment_borrow = mysql_query("ALTER TABLE `".$business_id."_borrow` AUTO_INCREMENT=100");
+    $items_serials = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_items_serials` (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `item` int(11) NOT NULL,
+            `serialNumber` varchar(200) NOT NULL,
+            `sales_id` bigint(20) NOT NULL,
+            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
 
-  return true;
+    $auto_inc_items_serial = $conn->query("ALTER TABLE `".$business_id."_items_serial` AUTO_INCREMENT=100 ");
+
+    $order_details = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_order_details` (
+            `oid` bigint(100) NOT NULL AUTO_INCREMENT,
+            `pid` varchar(100) NOT NULL,
+            `qty` double NOT NULL,
+            `price` double NOT NULL,
+            `value` double NOT NULL,
+            `ref` varchar(100) NOT NULL,
+            `qtySupplied` double NOT NULL,
+            `priceSupplied` double NOT NULL,
+            `valueOfSupplied` double NOT NULL,
+            PRIMARY KEY (`oid`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+    ");
+
+    $auto_inc_order_details = $conn->query("ALTER TABLE `".$business_id."_order_details` AUTO_INCREMENT=100 ");
+
+    $payment_analysis = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_payment_analysis` (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `date` datetime NOT NULL,
+            `tid` varchar(200) NOT NULL,
+            `amount` double NOT NULL,
+            `cash` double NOT NULL,
+            `pos` double NOT NULL,
+            `transfer` double NOT NULL,
+            `balance` double NOT NULL,
+            `status` varchar(20) DEFAULT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $auto_inc_payment_analysis = $conn->query("ALTER TABLE `".$business_id."_payment_analysis` AUTO_INCREMENT=100 ");
+
+    $payment_details = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_payment_details` (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `cust_id` bigint(11) NOT NULL,
+            `amount` double NOT NULL,
+            `date` date NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $auto_inc_payment_details = $conn->query("ALTER TABLE `".$business_id."_payment_details` AUTO_INCREMENT=100 ");
+
+    $placed_order = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_placed_order` (
+            `ref` int(11) NOT NULL AUTO_INCREMENT,
+            `supplier` varchar(100) NOT NULL,
+            `valueOrdered` double NOT NULL,
+            `dateOrdered` date NOT NULL,
+            `dateSupplied` date NOT NULL,
+            `valueSupplied` double NOT NULL,
+            `status` varchar(50) NOT NULL,
+            PRIMARY KEY (`ref`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $auto_inc_placed_order = $conn->query("ALTER TABLE `".$business_id."_placed_order` AUTO_INCREMENT=100 ");
+
+    $return = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_return` (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `trans_id` int(11) NOT NULL,
+            `reason` text NOT NULL,
+            `request_by` int(11) NOT NULL,
+            `request_date` date NOT NULL,
+            `approved_by` int(11) NOT NULL,
+            `approved_date` date NOT NULL,
+            `status` varchar(20) NOT NULL,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $sales = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_sales` (
+            `sales_id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `item_id` int(11) NOT NULL,
+            `qty` double NOT NULL,
+            `cost_price` double NOT NULL,
+            `sold_price` double NOT NULL,
+            `sub_total` double NOT NULL,
+            `trans_id` int(11) NOT NULL,
+            `date` date NOT NULL,
+            `cashier` varchar(200) NOT NULL,
+            `status` varchar(20) DEFAULT NULL,
+            PRIMARY KEY (`sales_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $auto_inc_sales = $conn->query("ALTER TABLE `".$business_id."_sales` AUTO_INCREMENT=100 ");
+
+    $st_items = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_st_items` (
+            `id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `item` int(11) NOT NULL,
+            `qty` double NOT NULL,
+            `date` date NOT NULL,
+            `user` int(11) NOT NULL,
+            `timeStamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $auto_inc_st_items = $conn->query("ALTER TABLE `".$business_id."_st_items` AUTO_INCREMENT=100 ");
+
+    $st_sales = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_st_sales` (
+            `id` bigint(11) NOT NULL AUTO_INCREMENT,
+            `amount` double NOT NULL,
+            `qty` double NOT NULL,
+            `date` date NOT NULL,
+            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $auto_incerement_st_sales = $conn->query("ALTER TABLE `".$business_id."_st_sales` AUTO_INCREMENT=100 ");
+
+    $suppliers = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_suppliers` (
+            `ID` bigint(20) NOT NULL AUTO_INCREMENT,
+            `full_name` text,
+            `address` text,
+            `phone` varchar(30) DEFAULT NULL,
+            `total_debt` double NOT NULL,
+            `total_credit` double NOT NULL,
+            PRIMARY KEY (`ID`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $auto_inc_suppliers = $conn->query("ALTER TABLE `".$business_id."_suppliers` AUTO_INCREMENT=100 ");
+
+    $trans = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_trans` (
+            `tid` bigint(20) NOT NULL,
+            `total_sales` double NOT NULL,
+            `date` date NOT NULL,
+            `mop` varchar(11) NOT NULL,
+            `amount_tendered` double NOT NULL,
+            `change` int(11) NOT NULL,
+            `balance` double NOT NULL,
+            `cid` int(11) NOT NULL,
+            `cashier` varchar(200) NOT NULL,
+            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `status` varchar(20) DEFAULT NULL,
+            PRIMARY KEY (`tid`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $users = $conn->query("
+        CREATE TABLE IF NOT EXISTS `".$business_id."_users` (
+            `username` int(11) NOT NULL AUTO_INCREMENT,
+            `fullname` text NOT NULL,
+            `phone` varchar(15) NOT NULL,
+            `email` varchar(200) NOT NULL,
+            `address` varchar(200) NOT NULL,
+            `password` varchar(64) NOT NULL,
+            `active_status` varchar(20) NOT NULL,
+            `recover_password` varchar(20) NOT NULL,
+            `clrs` int(11) NOT NULL,
+            `security_question` text NOT NULL,
+            `security_answer` text NOT NULL,
+            PRIMARY KEY (`username`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+
+    $businesses = $conn->query("
+        CREATE TABLE `businesses` (
+            `business_id` bigint(20) NOT NULL AUTO_INCREMENT,
+            `business_name` varchar(200) NOT NULL,
+            `business_address` varchar(200) NOT NULL,
+            `customer_name` varchar(100) NOT NULL,
+            `phone` varchar(15) NOT NULL,
+            `email` varchar(200) NOT NULL,
+            `date_registered` date NOT NULL,
+            `active_status` varchar(15) NOT NULL DEFAULT '0',
+            `verified_status` varchar(15) NOT NULL,
+            `verification_code` varchar(64) NOT NULL,
+            `date_verified` date NOT NULL,
+            PRIMARY KEY (`business_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    ");
+  
+    return true;
 }
 
 function updateBusinesses($business_id){
 
+    global $conn;
     $date_verified = date("Y-m-d");
-    mysql_query("UPDATE businesses SET active_status = 'active', verified_status = 'verified', date_verified = '$date_verified' WHERE business_id = '$business_id'");
 
-    return true;
+    $stmt = $conn->prepare("UPDATE businesses SET active_status = 'active', verified_status = 'verified', date_verified = '$date_verified' WHERE business_id = :business_id ");
+	$query = $stmt->execute(['business_id' => $business_id]);
+
+    if ($query) {
+        return true;
+    }else {
+        return false;
+    }
+    
 }
 
 function logged_in(){
-    //return (isset($_SESSION['cur_user']) && isset($_SESSION["business_id"]) && isset($_SESSION["clearance"])) ? true : false;
+    return (isset($_SESSION['cur_user']) && isset($_SESSION["business_id"]) && isset($_SESSION["clearance"])) ? true : false;
     
-    if ($_SESSION['cur_user'] == "") {return false;} else {return true;}
+    //if ($_SESSION['cur_user'] == "") {return false;} else {return true;}
 }
 
 function checkChangePassword($username){
-    
-    $query = mysql_query("SELECT recover_password FROM ".$_SESSION["business_id"]."_users WHERE username = '$username' AND recover_password = 'yes'");
 
-    return (mysql_num_rows($query) >= 1) ? true : false;
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT recover_password FROM ".$_SESSION["business_id"]."_users WHERE username = :username AND recover_password = 'yes'");
+    $stmt->execute(['username' => $username]);
+
+    $rows = $stmt->rowCount();
+    
+    return (($rows) >= 1) ? true : false;
 }
 
 function protectPage($clearance){
@@ -1289,8 +1502,6 @@ function protectPage($clearance){
 	    exit();
     }
 
-    
-
 }
 
 function sanitize($string){
@@ -1298,7 +1509,7 @@ function sanitize($string){
     //$string = strip_tags($string);
     $string = htmlentities($string);
     $string = stripslashes($string);
-    return mysql_real_escape_string($string);
+    return ($string);
 }
 
 function escape($string){
@@ -1336,35 +1547,49 @@ function notify($msg,$owner,$subject,$from){
 
 function getCustomerBal($customer) {
 
-     $q = mysql_query("select * from ".$_SESSION["business_id"]."_customers where  ID='$customer' ") or die (mysql_error());
- 
-     if (mysql_num_rows($q)>0){
+    global $conn;
 
-        $row = mysql_fetch_array($q);
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE  ID= :customer ");
+    $stmt->execute(['customer' => $customer]);
+
+    $rows = $stmt->rowCount();
+
+    if ($rows>0){
+
+        $row = $stmt->fetch();
  
-        $total_debt = $row["total_debt"];
-        $total_credit = $row["total_credit"];
+        $total_debt = $row->total_debt;
+        $total_credit = $row->total_credit;
      
-         return ($total_credit - $total_debt);
+        return ($total_credit - $total_debt); 
      }
   
 }
  
 function getDailyDeposites($date1, $date2, $type, $payment_class){
-
+    //Look for better way to include payment class in prepared statement
+    global $conn;
     $total_deposites = 0;
-    if($payment_class){ $q = mysql_query("select * from ".$_SESSION["business_id"]."_payment_details where date between '$date1' and '$date2' and payment_type='$payment_class' ");}
-    else {$q = mysql_query("select * from ".$_SESSION["business_id"]."_payment_details where date between '$date1' and '$date2' ");}
 
-        if (mysql_num_rows($q)>0){
+    if($payment_class){ 
+        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE date between '$date1' and '$date2' and payment_type='$payment_class' ";
+    }else {
+        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details where date between '$date1' and '$date2' ";
+    }
 
-            while($row = mysql_fetch_array($q)){
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $rows = $stmt->rowCount();
+
+        if ($rows>0){
+
+            while($row = $stmt->fetch()){
                 
-                $amount = $row["amount"];
-                $cash_amount = $row["cash"];
-                $pos_amount = $row["pos"];
-                $transfer_amount = $row["transfer"];
-
+                $amount = $row->amount;
+                $cash_amount = $row->cash;
+                $pos_amount = $row->pos;
+                $transfer_amount = $row->transfer;
 
                 switch ($type){
 
@@ -1383,10 +1608,13 @@ function getDailyDeposites($date1, $date2, $type, $payment_class){
 
 function insertReturn($trans_id, $reason){
  
+    global $conn;
     $user = $_SESSION["cur_user"];
     $today = date("Y-m-d");
-    $query = mysql_query("INSERT INTO ".$_SESSION["business_id"]."_return values('','$trans_id','$reason','$user','$today','','','awaitingapproval')");
 
+    $stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_return (id, trans_id, reason,	request_by, request_date, approved_by, approved_date, status) VALUES (:id, :trans_id, :reason,	:request_by, :request_date, :approved_by, :approved_date, :status) ");
+    $query = $stmt->execute(['id' => "", 'trans_id' => $trans_id, 'reason' => $reason, 'request_by' => $user, 'request_date' => $today, 'approved_by' => "", 'approved_date' => "", 'status' => "awaitingapproval"]);
+    
     if ($query) {
         return true;
     }else {

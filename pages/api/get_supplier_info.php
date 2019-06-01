@@ -1,25 +1,27 @@
 <?php
 
-			require("../../inc/config.php");
+require("../../inc/config.php");
 
+//instanciate connection class
+$Config = new Config;
+$conn = $Config->connect();
 
+	$id = $_GET["cid"];
 
-$id = $_GET["cid"];
+	$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers WHERE ID = :id ");
+	$stmt->execute(['id' => $id]);
 
+	$rows = $stmt->rowCount();
 	
-	$q = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_suppliers where id='$id' ");
+	$output = array();
 
-$output = array();
-
-if (mysql_num_rows($q)>0){
-	
-	while($row = mysql_fetch_array($q)){
-		$output[] = $row;
-	} 
-	
-	print(json_encode($output));
-}
-	
-
+	if ($rows>0){
+		
+		while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+			$output[] = $row;
+		} 
+		
+		print(json_encode($output));
+	}
 
 ?>

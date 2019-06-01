@@ -20,7 +20,7 @@ if (logged_in()) {
         <div class="card">
             <div class="body">
                <?php
-				
+				//@Kolerian Todo Nothing to change all the code is intact
                 if(isset($_POST["submit"])){
 
                     $uname = sanitize($_POST["username"]);
@@ -76,8 +76,8 @@ if (logged_in()) {
                     <div class="row m-t-15 m-b--20">
                         
                         <div class="col-xs-6 align-right">
-                            <a href="forget-password.php">Forget Password</a>
-                                                    </div>
+                            <a href="forget_password.php">Forget Password</a>
+                        </div>
                     </div>
                 </form>
             </div>
