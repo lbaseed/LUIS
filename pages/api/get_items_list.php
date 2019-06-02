@@ -6,10 +6,6 @@ require("../../inc/config.php");
 	$id = $_GET["id"];
 	
 	
-	//instanciate connection class
-	$Config = new Config;
-	$conn = $Config->connect();
-
 	if ($type=="one"){
 		
 		$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id =? ");

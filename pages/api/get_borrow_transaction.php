@@ -1,10 +1,6 @@
 <?php
 //BUG check real name of trans id in _borrow_trans
-
-	require("../../inc/config.php");
-	//instanciate connection class
-	$Config = new Config;
-	$conn = $Config->connect();
+require("../../inc/config.php");
 
 	$tid = $_GET["tid"];
 	$buss_id = $_SESSION["business_id"];

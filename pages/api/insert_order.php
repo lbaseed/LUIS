@@ -2,10 +2,6 @@
 	require("../../inc/config.php"); 
 	require("../../inc/php_functions.php");
 
-	//instanciate connection class
-	$Config = new Config;
-	$conn = $Config->connect();
-
 $business_id = $_SESSION["business_id"];
 
 	if(isset($_POST['myData'])){
@@ -29,8 +25,8 @@ $business_id = $_SESSION["business_id"];
 			
 			//insert order
 
-			$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_order_details (oid,item_id,qty,price,value,ref,qtySupplied,priceSupplied,valueOfSupplied) VALUES (:oid,:item_id,:qty,:price,:value,:ref)");
-    		$insert_sale = $stmt->execute(['oid' => "", 'item_id' => $item_id, 'item_qty' => $item_qty, 'item_price' => $item_price]);
+			$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_order_details (oid,item_id,qty,price,value,ref,date) VALUES (:oid,:item_id,:qty,:price,:value,:ref,:date)");
+    		$insert_sale = $stmt->execute(['oid' => "", 'item_id' => $item_id, 'qty' => $item_qty, 'price' => $item_price, 'value' => $sub_total, 'ref' => $tid, 'date' => $dt]);
 				
 			//$insert_sale = mysql_query("insert into ".$business_id."_order_details values('','$item_id','$item_qty','$item_price','$sub_total','$tid','$dt')");
 			

@@ -38,4 +38,7 @@
         }
         
     }
+
+    $Config = new Config;
+    $conn = $Config->connect();
 ?>

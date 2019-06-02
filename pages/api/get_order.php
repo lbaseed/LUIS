@@ -1,10 +1,5 @@
 <?php
-
 require("../../inc/config.php");
-//instanciate connection class
-$Config = new Config;
-$conn = $Config->connect();
-
 
 	$tid = $_GET["tid"];
 	$buss_id = $_SESSION["business_id"];

@@ -4,10 +4,6 @@ ob_start();
 include("../../inc/config.php"); 
 include("../../inc/php_functions.php");   
 
-//instanciate connection class
-$Config = new Config;
-$conn = $Config->connect();
-
     if (isset($_POST["action"])) {
 
         $transaction_id = $_POST["transaction_id"];

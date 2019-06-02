@@ -8,9 +8,6 @@
     //$_SESSION["home_link"] = "http://localhost:81/LUIS/pages/"; 
 
 
-    $Config = new Config;
-    $conn = $Config->connect();
-
 function autologout($sec){		
 	if (isset( $_SESSION["ctime"]))
 		{
