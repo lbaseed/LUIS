@@ -159,14 +159,12 @@ include "config.php";
     $order_details = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_order_details` (
             `oid` bigint(100) NOT NULL AUTO_INCREMENT,
-            `pid` varchar(100) NOT NULL,
+            `item_id` varchar(100) NOT NULL,
             `qty` double NOT NULL,
             `price` double NOT NULL,
             `value` double NOT NULL,
             `ref` varchar(100) NOT NULL,
-            `qtySupplied` double NOT NULL,
-            `priceSupplied` double NOT NULL,
-            `valueOfSupplied` double NOT NULL,
+            `date` date NOT NULL,
             PRIMARY KEY (`oid`)
         ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
     ");
@@ -176,7 +174,7 @@ include "config.php";
     $payment_analysis = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_payment_analysis` (
             `id` bigint(20) NOT NULL AUTO_INCREMENT,
-            `date` datetime NOT NULL,
+            `date` date NOT NULL,
             `tid` varchar(200) NOT NULL,
             `amount` double NOT NULL,
             `cash` double NOT NULL,

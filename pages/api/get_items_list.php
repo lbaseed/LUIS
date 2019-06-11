@@ -8,8 +8,8 @@ require("../../inc/config.php");
 	
 	if ($type=="one"){
 		
-		$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id =? ");
-		$stmt->execute([$id]);
+		$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_items WHERE item_id = :item_id ");
+		$stmt->execute(['item_id' => $id]);
 		
     	$rows = $stmt->rowCount();
 		

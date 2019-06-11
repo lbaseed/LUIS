@@ -1,7 +1,4 @@
 // JavaScript Document
-
-
-
 $("#fetched_items_list").change(function(){
 
     var itemSelected = $(this).val();

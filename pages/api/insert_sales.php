@@ -2,7 +2,8 @@
 require("../../inc/config.php"); 
 require("../../inc/php_functions.php");
 
-$business_id = $_SESSION["business_id"];
+
+	$business_id = $_SESSION["business_id"];
 
 	if(isset($_POST['myData'])){
 		
@@ -40,7 +41,7 @@ $business_id = $_SESSION["business_id"];
 				
 				if($item_serial !=""){
 
-					$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_items_serials (id,item,serialNumber,sales_id,timeStamp) VALUES (:id,:item,:serialNumber,:sales_id,NOW() ) ");
+					$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_items_serials (`id`,`item`,`serialNumber`,`sales_id`,`timeStamp`) VALUES (:id,:item,:serialNumber,:sales_id,NOW() ) ");
 					$stmt->execute(['id' => "", 'item' => $item_id, 'serialNumber' => $item_serial, 'sales_id' => $sales_id ]);
 				
 					//$insert_serails = mysql_query("insert into ".$business_id."_items_serials values('','$item_id','$item_serial','$sales_id',NOW()) ");
@@ -138,17 +139,15 @@ $business_id = $_SESSION["business_id"];
 			}
 			
 		}
-		$today = date("Y-m-d");
-		
-		//`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`
 
-		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_trans (tid,total_sales,date,mop,amount_tendered,change,balance,cid,cashier,timeStamp,status) VALUES (:tid,:total_sales,:date,:mop,:amount_tendered,:change,:balance,:cid,:cashier,NOW(),:status) ");
+		$today = date("Y-m-d");
+		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_trans (`tid`, `total_sales`, `date`, `mop`, `amount_tendered`, `change`, `balance`, `cid`, `cashier`, `timeStamp`, `status`) VALUES (:tid, :total_sales, :date, :mop, :amount_tendered, :change, :balance, :cid, :cashier, NOW(), :status) ");
 		$insert_trans = $stmt->execute(['tid' => $tid, 'total_sales' => $total, 'date' => $dt, 'mop' => $mop, 'amount_tendered' => $am_tendered, 'change' => $change, 'balance' => $bal, 'cid' => $cust_id, 'cashier' => $_SESSION["cur_user"], 'status' => "" ]);
-				
+		
 		//$insert_trans = mysql_query("insert into ".$business_id."_trans values('$tid','$total','$dt','$mop','$am_tendered','$change','$bal','$cust_id','".$_SESSION["cur_user"]."',NOW(),'')");
 		
 		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_analysis (id,date,tid,amount,cash,pos,transfer,balance,status) VALUES (:id,:date,:tid,:amount,:cash,:pos,:transfer,:balance,:status) ");
-		$insert_trans = $stmt->execute(['id' => "", 'date' => $today, 'tid' => $tid, 'amount' => $total, 'cash' => $cash_mop, 'pos' => $pos_mop, 'transfer' => $trnf_mop, 'balance' => $bal, 'status' => ""]);
+		$insert_payment_analysis = $stmt->execute(['id' => "", 'date' => $today, 'tid' => $tid, 'amount' => $total, 'cash' => $cash_mop, 'pos' => $pos_mop, 'transfer' => $trnf_mop, 'balance' => $bal, 'status' => ""]);
 				
 		//$insert_payment_analysis = mysql_query("insert into ".$business_id."_payment_analysis values('','$today','$tid','$total','$cash_mop','$pos_mop','$trnf_mop','$bal','') ");
 		
@@ -160,21 +159,21 @@ $business_id = $_SESSION["business_id"];
 
 		//$check_loggin = mysql_query("select * from ".$business_id."_st_sales where date='$dt'");
 
-		if ($row > 0){
+		if ($rows > 0){
 
 			$row = $stmt->fetch();
 
 			$id = $row->id;
 
 			$stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_st_sales SET amount = amount + :total, qty = qty + :total_qty WHERE id = :id ");
-			$trans = $stmt->execute(['total' => $total, 'total_qty' => $total_qty]);
+			$trans = $stmt->execute(['total' => $total, 'total_qty' => $total_qty, 'id' => $id]);
 		
 			//$loggin_update = mysql_query("update ".$business_id."_st_sales set amount=amount + '$total', qty=qty + '$total_qty' where id='$id'");
 			
 		}else {
 
-			$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_sales (id,amount,qty,date,timeStamp) VALUES (:id,:amount,:qty,:date,NOW()) ");
-			$insert_trans = $stmt->execute(['id' => "", 'amount' => $total, 'qty' => $total_qty, 'date' => $dt ]);
+			$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_sales (`id`,`amount`,`qty`,`date`,`timeStamp`) VALUES (:id,:amount,:qty,:date,NOW()) ");
+			$loggin = $stmt->execute(['id' => "", 'amount' => $total, 'qty' => $total_qty, 'date' => $dt ]);
 			
 			//$loggin = mysql_query("insert into ".$business_id."_st_sales values('','$total','$total_qty','$dt',NOW())");
 		}

@@ -49,7 +49,6 @@ require("../../inc/config.php");
 
 			//get customer information
 			$cust_id = $row2["cid"];
-			
 			if ($cust_id != 0){
 
 				$stmt3 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE ID = :cust_id ");
