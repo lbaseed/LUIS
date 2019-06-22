@@ -1475,8 +1475,8 @@ function checkChangePassword($username){
 }
 
 function protectPage($clearance){
-
-    $currentPage = end(explode('/', $_SERVER['SCRIPT_NAME']));
+    $page = explode('/', $_SERVER['SCRIPT_NAME']);
+    $currentPage = end($page);
 
     if (logged_in() === false) {
         logout();

@@ -2,7 +2,8 @@
 
 //$home_link = $_SESSION["home_link"];
 $accesslevel = $_SESSION["clearance"];
-$page = end(explode('/', $_SERVER['SCRIPT_NAME']));
+$pagename = explode('/', $_SERVER['SCRIPT_NAME']);
+$page = end($pagename);
 
 ?>
 
