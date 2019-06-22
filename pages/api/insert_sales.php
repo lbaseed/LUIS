@@ -32,7 +32,7 @@ require("../../inc/php_functions.php");
 				//insert sales and serials record
 				$cost_price = getCostPrice($item_id);
 
-				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_sales (sales_id,item_id,qty,cost_price,sold_price,sub_total,trans_id,date,cashier,status) VALUES (:sales_id, :item_id, :qty, :cost_price, :sold_price, :sub_total, :trans_id, :date, :cashier, :status) ");
+				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_sales (`sales_id`, `item_id`, `qty`, `cost_price`, `sold_price`, `sub_total`, `trans_id`, `date`, `cashier`, `status`) VALUES (:sales_id, :item_id, :qty, :cost_price, :sold_price, :sub_total, :trans_id, :date, :cashier, :status) ");
 				$stmt->execute(['sales_id' => "", 'item_id' => $item_id, 'qty' => $item_qty, 'cost_price' => $cost_price, 'sold_price' => $item_price, 'sub_total' => $sub_total, 'trans_id' => $tid, 'date' => $dt, 'cashier' => $_SESSION["cur_user"], 'status' => ""]);
 				
 				//$insert_sale = mysql_query("insert into ".$business_id."_sales values('','$item_id','$item_qty','$cost_price','$item_price','$sub_total','$tid','$dt','".$_SESSION["cur_user"]."','')");
@@ -77,7 +77,7 @@ require("../../inc/php_functions.php");
 
 					//insert daily category sales
 					
-					$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_daily_sales (id,date,category_daily_total,category) VALUES (:id,:date,:category_daily_total,:category) ");
+					$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_daily_sales (`id`, `date`, `category_daily_total`, `category`) VALUES (:id,:date,:category_daily_total,:category) ");
 					$stmt->execute(['id' => "",'date' => $dt,'category_daily_total' => $sub_total,'category' => $item_category]);
 				
 					//$insert_daily_sales = mysql_query("insert into ".$business_id."_daily_sales values ('','$dt','$sub_total','$item_category') ");
@@ -121,7 +121,7 @@ require("../../inc/php_functions.php");
 				//check for regular and non regular customers
 				if ($bal>0) {$type = 1; } else {$type = 0; }
 
-				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_customers (ID,full_name,address,phone,total_debt,total_credit,type) VALUES (:id, :cust_name, :cust_address, :cust_phone, :bal, :total_credit, :type) ");
+				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_customers (`ID`, `full_name`, `address`, `phone`, `total_debt`, `total_credit`, `type`) VALUES (:id, :cust_name, :cust_address, :cust_phone, :bal, :total_credit, :type) ");
 				$stmt->execute(['id' => "", 'cust_name' => $cust_name, 'cust_address' => $cust_address, 'cust_phone' => $cust_phone, 'bal' => $bal, 'total_credit' => 0, 'type' => $type ]);
 				
 				//$add_customer = mysql_query("insert into ".$business_id."_customers values('','$cust_name','$cust_address','$cust_phone','$bal','0','$type') ");
@@ -146,7 +146,7 @@ require("../../inc/php_functions.php");
 		
 		//$insert_trans = mysql_query("insert into ".$business_id."_trans values('$tid','$total','$dt','$mop','$am_tendered','$change','$bal','$cust_id','".$_SESSION["cur_user"]."',NOW(),'')");
 		
-		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_analysis (id,date,tid,amount,cash,pos,transfer,balance,status) VALUES (:id,:date,:tid,:amount,:cash,:pos,:transfer,:balance,:status) ");
+		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_analysis (`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`, `status`) VALUES (:id,:date,:tid,:amount,:cash,:pos,:transfer,:balance,:status) ");
 		$insert_payment_analysis = $stmt->execute(['id' => "", 'date' => $today, 'tid' => $tid, 'amount' => $total, 'cash' => $cash_mop, 'pos' => $pos_mop, 'transfer' => $trnf_mop, 'balance' => $bal, 'status' => ""]);
 				
 		//$insert_payment_analysis = mysql_query("insert into ".$business_id."_payment_analysis values('','$today','$tid','$total','$cash_mop','$pos_mop','$trnf_mop','$bal','') ");

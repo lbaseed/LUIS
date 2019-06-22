@@ -114,7 +114,7 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
                                         
                                         if ($item_name and $cat and $cost_price and $sale_price){
 
-                                            $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_items (item_id, name, qty, cost_price, sale_price, cat_id, med_id, date, status, barcode) VALUES (:item_id, :name, :qty, :cost_price, :sale_price, :cat_id, :med_id, :date, :status, :barcode) ");
+                                            $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_items (`item_id`, `name`, `qty`, `cost_price`, `sale_price`, `cat_id`, `med_id`, `date`, `status`, `barcode`) VALUES (:item_id, :name, :qty, :cost_price, :sale_price, :cat_id, :med_id, :date, :status, :barcode) ");
                                             $query = $stmt->execute(['item_id' => "", 'name' => $item_name, 'qty' => $qty, 'cost_price' => $cost_price, 'sale_price' => $sale_price, 'cat_id' => $cat, 'med_id' => "", 'date' => $date, 'status' => 1, 'barcode' => $item_code ]);
 				
                                             if ($query) { 

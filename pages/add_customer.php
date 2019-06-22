@@ -126,7 +126,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 									
 								if ($full_name and $address and $pnum ){ 
 
-                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_customers (ID,full_name,address,phone,total_debt,total_credit,type) VALUES (:id, :cust_name, :cust_address, :cust_phone, :bal, :total_credit, :type) ");
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_customers (`ID`, `full_name`, `address`, `phone`, `total_debt`, `total_credit`, `type`) VALUES (:id, :cust_name, :cust_address, :cust_phone, :bal, :total_credit, :type) ");
 				                    $query = $stmt->execute(['id' => "", 'cust_name' => $full_name, 'cust_address' => $address, 'cust_phone' => $pnum, 'bal' => 0, 'total_credit' => 0, 'type' => 1 ]);
 				
 									$customer_id  = $conn->lastInsertId();

@@ -87,7 +87,7 @@ protectPage(6);
 									
 								if ($full_name and $address and $pnum ){
 
-                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_suppliers (ID,full_name,address,phone,total_debt,total_credit) VALUES (:ID,:full_name,:address,:phone,:total_debt,:total_credit) ");
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_suppliers (`ID`, `full_name`, `address`, `phone`, `total_debt`, `total_credit`) VALUES (:ID,:full_name,:address,:phone,:total_debt,:total_credit) ");
 				                    $query = $stmt->execute(['ID' => "",'full_name' => $full_name,'address' => $address,'phone'=>$pnum,'total_debt'=>0,'total_credit'=>0 ]);
 									
 									$customer_id  = $conn->lastInsertId();

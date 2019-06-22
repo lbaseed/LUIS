@@ -1607,7 +1607,7 @@ function insertReturn($trans_id, $reason){
     $user = $_SESSION["cur_user"];
     $today = date("Y-m-d");
 
-    $stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_return (id, trans_id, reason,	request_by, request_date, approved_by, approved_date, status) VALUES (:id, :trans_id, :reason,	:request_by, :request_date, :approved_by, :approved_date, :status) ");
+    $stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_return (`id`, `trans_id`, `reason`, `request_by`, `request_date`, `approved_by`, `approved_date`, `status`) VALUES (:id, :trans_id, :reason,	:request_by, :request_date, :approved_by, :approved_date, :status) ");
     $query = $stmt->execute(['id' => "", 'trans_id' => $trans_id, 'reason' => $reason, 'request_by' => $user, 'request_date' => $today, 'approved_by' => "", 'approved_date' => "", 'status' => "awaitingapproval"]);
     
     if ($query) {

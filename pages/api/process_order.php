@@ -32,7 +32,7 @@ include '../../inc/config.php';
             //$query = mysql_query("update ".$bid."_items set qty=qty + '$item_qty', cost_price='$item_cost_price', date=NOW() where item_id='$item_id' ");					
             
             //loggin
-            $stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_items (id,item,qty,date,user,timeStamp) VALUES(:id,:item,:qty,:date,:user,NOW()) ");
+            $stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_items (`id`, `item`, `qty`, `date`, `user`, `timeStamp`) VALUES(:id,:item,:qty,:date,:user,NOW()) ");
             $loggin = $stmt->execute(['id' => "", 'item' => $item_id , 'qty' => $item_qty, 'date' => $date , 'user' => $_SESSION["cur_user"] ]);
 
 			//$loggin = mysql_query("insert into ".$bid."_st_items values('','$item_id','$item_qty','$date','".$_SESSION["cur_user"]."',NOW())");

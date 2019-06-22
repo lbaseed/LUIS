@@ -86,7 +86,7 @@ protectPage(9);
                                 
 								if($fullName and $level){
 
-									$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_users (username, fullname, phone, email, address, password, active_status, recover_password, clrs, security_question, security_answer) VALUES (:username, :fullname, :phone, :email, :address, :password, :active_status, :recover_password, :clrs, :security_question, :security_answer) ");
+									$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_users (`username`, `fullname`, `phone`, `email`, `address`, `password`, `active_status`, `recover_password`, `clrs`, `security_question`, `security_answer`) VALUES (:username, :fullname, :phone, :email, :address, :password, :active_status, :recover_password, :clrs, :security_question, :security_answer) ");
 				                    $query = $stmt->execute(['username' => "", 'fullname' => $fullName, 'phone' => $phone, 'email' => $email, 'address' => $address, 'password' => "pass", 'active_status' => $active_status, 'recover_password' => $recover_status, 'clrs' => $level, 'security_question' => "", 'security_answer' => "" ]);
 				
 									$user_id  = $conn->lastInsertId();

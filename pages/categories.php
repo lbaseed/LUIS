@@ -83,7 +83,7 @@ protectPage(6);
 									
 								if ($cat_name){
 
-                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_categories (id,name) VALUES (:id,:name) ");
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_categories (`id`,`name`) VALUES (:id,:name) ");
 					                $query = $stmt->execute(['id' => "",'name' => $cat_name]);
 				
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Category added Successfully</div>";}

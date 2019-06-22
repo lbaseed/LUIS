@@ -28,7 +28,7 @@ require("../../inc/php_functions.php");
 			//insert borrow
 			$cost_price = getCostPrice($item_id);
 
-			$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_borrow (borrow_id,item_id,qty,cost_price,borrow_price,sub_total,trans_id,date,cashier) VALUES (:id, :item_id, :item_qty, :cost_price, :item_price, :sub_total, :tid, :dt, :cur_user) ");
+			$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_borrow (`borrow_id`, `item_id`, `qty`, `cost_price`, `borrow_price`, `sub_total`, `trans_id`, `date`, `cashier`) VALUES (:id, :item_id, :item_qty, :cost_price, :item_price, :sub_total, :tid, :dt, :cur_user) ");
 			$stmt->execute(['id' => "", 'item_id' => $item_id, 'item_qty' => $item_qty, 'cost_price' => $cost_price, 'item_price' => $item_price, 'sub_total' => $sub_total, 'tid' => $tid, 'dt' => $dt, 'cur_user' => $_SESSION["cur_user"] ]);
 				
 			//$sales_id = mysql_insert_id();
@@ -90,13 +90,13 @@ require("../../inc/php_functions.php");
 				//type 2 denotes borrower
 				$type = 2;
 
-				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_customers (ID,full_name,address,phone,total_debt,total_credit,type) VALUES (:id, :cust_name, :cust_address, :cust_phone, :bal, :total_credit, :type) ");
+				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_customers (`ID`, `full_name`, `address`, `phone`, `total_debt`, `total_credit`, `type`) VALUES (:id, :cust_name, :cust_address, :cust_phone, :bal, :total_credit, :type) ");
 				$stmt->execute(['id' => "", 'cust_name' => $cust_name, 'cust_address' => $cust_address, 'cust_phone' => $cust_phone, 'bal' => $bal, 'total_credit' => 0, 'type' => $type ]);
 				
 				$cust_id = $conn->lastInsertId(); 
 				
 				//`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`
-				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_borrow_trans (tid,total_sales,date,mop,amount_tendered,change,balance,cid,cashier,timeStamp) VALUES (:tid, :total, :dt, :mop, :am_tendered, :change, :bal, :cust_id, :cur_user, NOW()) ");
+				$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_borrow_trans (`tid`, `total_sales`, `date`, `mop`, `amount_tendered`, `change`, `balance`, `cid`, `cashier`, `timeStamp`) VALUES (:tid, :total, :dt, :mop, :am_tendered, :change, :bal, :cust_id, :cur_user, NOW()) ");
 				$insert_trans = $stmt->execute(['tid' => $tid, 'total' => $total, 'dt' => $dt, 'mop' => $mop, 'am_tendered' => $am_tendered, 'change' => $change, 'bal' => $bal, 'cust_id' => $cust_id, 'cur_user' => $_SESSION["cur_user"] ]);
 				
 				//$insert_trans = mysql_query("insert into ".$business_id."_borrow_trans values('$tid','$total','$dt','$mop','$am_tendered','$change','$bal','$cust_id','".$_SESSION["cur_user"]."',NOW()) ");
@@ -140,12 +140,12 @@ require("../../inc/php_functions.php");
 		
 		//$trans = mysql_query("update ".$business_id."_trans set amount_tendered='$amount_tendered',balance=balance-'$amount_tendered',cashier='".$_SESSION["cur_user"]."',timeStamp=NOW(), where trans_id='$trans_id'");
 		
-		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_daily_sales (id,date,category_daily_total,category) VALUES (:id,:date,:category_daily_total,:category) ");
+		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_daily_sales (`id`, `date`, `category_daily_total`, `category`) VALUES (:id,:date,:category_daily_total,:category) ");
 		$upt_dailysales = $stmt->execute(['id' => "", 'date' => $t, 'category_daily_total' => $amount_tendered, 'category' => 1 ]);
 				
 		//$upt_dailysales=mysql_query("insert into ".$business_id."_daily_sales values('','$t','$amount_tendered','1')");
 		
-		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_analysis (id,date,tid,amount,cash,pos,transfer,balance,status) VALUES (:id,NOW(),:tid,:amount,:cash,:pos,:transfer,:balance,:status) ");
+		$stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_analysis (`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`, `status`) VALUES (:id,NOW(),:tid,:amount,:cash,:pos,:transfer,:balance,:status) ");
 		$pymnt_anl = $stmt->execute(['id' => "", 'tid' => $trans_id, 'amount' => $amount_tendered, 'cash' => 1, 'pos' => 0, 'transfer' => 0 , 'balance' => $bal, 'status' => ""]);
 				
 		//$pymnt_anl=mysql_query("insert into ".$business_id."_payment_analysis values('',NOW(),'$trans_id','$amount_tendered','1','0','0','$bal')");

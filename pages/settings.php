@@ -90,7 +90,7 @@ protectPage(9);
                                     $query = $stmt->execute(['post_qty' => $post_qty, 'date' => $date, 'post_item_id'=> $post_item_id]);
                                     
                                     //loggin
-                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_items (id,item,qty,date,user,timeStamp) VALUES (:id,:item,:qty,:date,:user,NOW() ) ");
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_items (`id`, `item`, `qty`, `date`, `user`, `timeStamp`) VALUES (:id,:item,:qty,:date,:user,NOW() ) ");
 				                    $loggin = $stmt->execute(['id' => "", 'item' => $post_item_id, 'qty' => $post_qty, 'date' => $date, 'user' => $_SESSION["cur_user"] ]);
 				
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Stock updated Successfully</div>";}

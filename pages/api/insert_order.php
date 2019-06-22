@@ -25,7 +25,7 @@ $business_id = $_SESSION["business_id"];
 			
 			//insert order
 
-			$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_order_details (oid,item_id,qty,price,value,ref,date) VALUES (:oid,:item_id,:qty,:price,:value,:ref,:date)");
+			$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_order_details (`oid`, `item_id`, `qty`, `price`, `value`, `ref`, `date`) VALUES (:oid,:item_id,:qty,:price,:value,:ref,:date)");
     		$insert_sale = $stmt->execute(['oid' => "", 'item_id' => $item_id, 'qty' => $item_qty, 'price' => $item_price, 'value' => $sub_total, 'ref' => $tid, 'date' => $dt]);
 				
 			//$insert_sale = mysql_query("insert into ".$business_id."_order_details values('','$item_id','$item_qty','$item_price','$sub_total','$tid','$dt')");
@@ -56,7 +56,7 @@ $business_id = $_SESSION["business_id"];
 			
 		}
 		
-		$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_placed_order () VALUES (:tid,:cust_id,:total,:dt,'','','NOT_SUPPLIED')");
+		$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_placed_order (`ref`, `supplier`, `valueOrdered`, `dateOrdered`, `dateSupplied`, `valueSupplied`, `status`) VALUES (:tid,:cust_id,:total,:dt,'','','NOT_SUPPLIED')");
 		$insert_trans = $stmt->execute(['tid' => $tid,'cust_id' => $cust_id, 'total' => $total, 'dt' => $dt]);
 		
 		//`id`, `date`, `tid`, `amount`, `cash`, `pos`, `transfer`, `balance`

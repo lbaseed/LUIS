@@ -228,13 +228,12 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 										
                                     //insert payment information
 
-                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_details SET address= :new_address, phone1 = :new_phone1, phone2 = :new_phone2, email = :new_email WHERE id = :rec_id_update ");
-					                $update_query = $stmt->execute(['new_address' => $new_address, 'new_phone1' => $new_phone1, 'new_phone2' => $new_phone2, 'email' => $new_email, 'rec_id_update' => $rec_id_update ]);
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_details (`id`, `cust_id`, `amount`, `cash`, `pos`, `transfer`, `payment_type`, `date`) VALUES (:id, :cust_id, :amount, :cash, :pos, :transfer, :payment_type, :date) ");
+					                $insert_payment = $stmt->execute(['id' => "", 'cust_id' => $customer, 'amount' => $total_payment, 'cash' => $amount_cash, 'pos' => $amount_pos, 'transfer' => $amount_trnf, 'payment_type' => $payment_type, 'date' => $today ]);
+                                    
+                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."customers SET total_credit= total_credit + :total_payment where ID= :customer");
+					                $q = $stmt->execute(['total_payment' => $total_payment, 'customer' => $customer ]);
 
-                                    $insert_payment = mysql_query("insert into ".$_SESSION["business_id"]."_payment_details values('','$customer','$total_payment','$amount_cash','$amount_pos','$amount_trnf','$payment_type','$today') ");
-									$q = mysql_query("update ".$_SESSION["business_id"]."_customers set total_credit= total_credit + '$total_payment' where ID='$customer' ");
-                                    
-                                    
 										if ($q) { message("x","green","Payment Accepted");}
 										
 										else {message("x","red","Operation Failed"); }	
