@@ -271,11 +271,12 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 											
                                     //     }
 
-                                    if(isset($_POST["submit"]))
+                                    if(isset($_GET["submit"]))
                                     {
                                         //search sales record
                                         $user = sanitize($_GET["user"]);
-                                        $dt = split(":",sanitize($_GET["date"]));
+                                        
+                                       $dt = explode(":", $_GET["date"]);
 
                                         if($user and $dt)
                                         {
@@ -283,7 +284,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 											$dt2 = trim($dt[1]);
 											$grand_total = 0;
                                             $total_profit = 0;
-                                            
+                                         
                                             if($user=="ALL")
                                             {
                                                 $statement = $conn->prepare("select * from ".$_SESSION["business_id"]."_trans where date BETWEEN ? AND ? order by `date` DESC");
@@ -298,7 +299,10 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                                     $user,$dt1,$dt2  
                                                 ]);
                                             }
+
                                             $rows_count = $statement->rowCount();
+                                            echo $rows_count;
+
                                             if($rows_count > 0)
                                             {
                                                 $sn = 1;
@@ -311,8 +315,8 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                                     $cid = $rec->cid;
                                                     if ($cid>0){ $type = get_customer($cid);  } else { $type = "Walk in Customer"; }
 
-                                                    $date = $rec["date"];
-													$cashier = $rec["cashier"]; 
+                                                    $date = $rec->date;
+													$cashier = $rec->cashier; 
 													$profit = get_profit($tid);
 													
 													//summation of total sales and profit
@@ -351,7 +355,10 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                             {
                                                 echo "<div class='alert alert-danger'>No Record Found</div>";
                                             }
-                                        }
+
+                                            
+                                        } 
+                                        
 
                                     }
                                         

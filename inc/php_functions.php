@@ -5,7 +5,7 @@
 
     //$_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
 
-    $_SESSION["home_link"] = "http://localhost:81/k9is/LUIS/pages/"; 
+    $_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
 
 
 function autologout($sec){		
@@ -160,7 +160,7 @@ function navigation_left(){
 	$home_link = $_SESSION["home_link"];
 	$bid = $_SESSION["business_id"];
 	
-	$logo = getTableData("{$bid}_company_profile", "id", "1", "logo");
+	$logo = getTableData("$bid_company_profile", "id", "1", "logo");
 		
     include '../pages/navigation.php'; 
             
@@ -305,7 +305,7 @@ function list_customers(){
 
     global $conn;
 
-    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE type='1' ORDER BY `ID` DESC ");
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE full_name!='' ORDER BY `ID` DESC ");
 	$stmt->execute();
 
     $rows = $stmt->rowCount();
@@ -403,7 +403,7 @@ function get_profit($tid){
     $profit = 0;
 
     $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :tid ");
-	$stmt->execute(['itd' => $tid]);
+	$stmt->execute(['tid' => $tid]);
 
     $rows = $stmt->rowCount();
     
@@ -1107,13 +1107,13 @@ function getTotalSalesType($type, $date1, $date2){
 }
 
 function initializeTables($business_id){
-    
+    global $conn;
     $audit_trail = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_audit_trail` (
             `id` bigint(11) NOT NULL AUTO_INCREMENT,
             `operation` varchar(50) NOT NULL,
             `date` date NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `user` int(11) NOT NULL,
             `activity` text NOT NULL,
             PRIMARY KEY (`id`)
@@ -1151,7 +1151,7 @@ function initializeTables($business_id){
             `balance` double NOT NULL,
             `cid` int(11) NOT NULL,
             `cashier` varchar(200) NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`tid`);
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
@@ -1247,7 +1247,7 @@ function initializeTables($business_id){
             `item` int(11) NOT NULL,
             `serialNumber` varchar(200) NOT NULL,
             `sales_id` bigint(20) NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
@@ -1352,7 +1352,7 @@ function initializeTables($business_id){
             `qty` double NOT NULL,
             `date` date NOT NULL,
             `user` int(11) NOT NULL,
-            `timeStamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
@@ -1365,7 +1365,7 @@ function initializeTables($business_id){
             `amount` double NOT NULL,
             `qty` double NOT NULL,
             `date` date NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
@@ -1397,7 +1397,7 @@ function initializeTables($business_id){
             `balance` double NOT NULL,
             `cid` int(11) NOT NULL,
             `cashier` varchar(200) NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_tamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `status` varchar(20) DEFAULT NULL,
             PRIMARY KEY (`tid`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1417,23 +1417,6 @@ function initializeTables($business_id){
             `security_question` text NOT NULL,
             `security_answer` text NOT NULL,
             PRIMARY KEY (`username`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-    ");
-
-    $businesses = $conn->query("
-        CREATE TABLE `businesses` (
-            `business_id` bigint(20) NOT NULL AUTO_INCREMENT,
-            `business_name` varchar(200) NOT NULL,
-            `business_address` varchar(200) NOT NULL,
-            `customer_name` varchar(100) NOT NULL,
-            `phone` varchar(15) NOT NULL,
-            `email` varchar(200) NOT NULL,
-            `date_registered` date NOT NULL,
-            `active_status` varchar(15) NOT NULL DEFAULT '0',
-            `verified_status` varchar(15) NOT NULL,
-            `verification_code` varchar(64) NOT NULL,
-            `date_verified` date NOT NULL,
-            PRIMARY KEY (`business_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
   
@@ -1532,10 +1515,7 @@ function notify($msg,$owner,$subject,$from){
             $headersMail .= 'From: ' . $fromMail . "\r\n" . 'Reply-To: ' . $fromMail . "\r\n";
             $headersMail .= 'Return-Path: ' . $fromMail . "\r\n";
 
-            if( mail($toMail, $subjectMail, $message, $headersMail)){
-                
-            return 1;									
-            }
+            mail($toMail, $subjectMail, $message, $headersMail);
 
 }
 

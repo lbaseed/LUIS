@@ -26,12 +26,12 @@ if(isset($_GET['auth']) and isset($_GET['veri'])){
         $username = $business_id."101";
         $fullname = $customer_name;
         $phone = $customer_phone;
-        $address = $customer_address;
+        $address = $business_address;
         $password = "pass";
         $active_status = 'active';
         $recover_status = 'yes';
         $dt = date("Y-m-d");
-        $logo = $business_id."jpg";
+        $logo = $business_id.".jpg";
 
         //Function That create tables for the particular business
         initializeTables($business_id);

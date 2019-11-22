@@ -61,6 +61,27 @@ var nf = Intl.NumberFormat();
 			
 		};
 		ourRequest.send();
+
+		//get data using ajax
+
+		// $.ajax({
+		// 	type: 'GET',
+		// 	url: "api/get_transaction.php",
+		// 	data: {tid: itemSelected},
+		// 	success: function(message){
+		// 		//open modal box and pass transaction ID
+
+		// 		console.log(message);
+
+		// 		//getTransaction();
+
+		// 	},
+		// 	error: function(){
+		// 		alert("error");
+		// 	}
+
+		// });
+
 }
 
 function getTransactionReceipt(refID){
@@ -116,7 +137,7 @@ function getTransactionReceipt(refID){
 			if (mop == "0/2" ) {mop_text = "POS";}
 			if (mop == "0/2/3" ) {mop_text = "POS/Trnf";}
 
-			if (mop == "01/3" ) {mop_text = "Cash/Trnf";}
+			if (mop == "0/1/3" ) {mop_text = "Cash/Trnf";}
 			if (mop == "0/3" ) {mop_text = "Trnf";}
 
 			

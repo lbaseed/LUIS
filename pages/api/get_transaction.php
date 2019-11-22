@@ -5,7 +5,7 @@ require("../../inc/config.php");
 	$tid = $_GET["tid"];
 	$buss_id = $_SESSION["business_id"];
 
-	$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :tid ");
+	$stmt = $conn->prepare("SELECT * FROM ".$buss_id."_sales WHERE trans_id = :tid ");
 	$stmt->execute(['tid' => $tid]);
 
     $rows = $stmt->rowCount();
@@ -31,8 +31,9 @@ require("../../inc/config.php");
 		while($row2 = $stmt2->fetch(PDO::FETCH_ASSOC)){
 		
 			$output[] = $row2;
-			
-			$mop = $output[0]["mop"];
+			$index = sizeof($output) -1;
+			$mop = $output[$index]["mop"];
+			$mop_text="";
 
 			if ($mop == "0" ) {$mop_text = "Loan";}
 			if ($mop == "0/1" ) {$mop_text = "Cash";}
@@ -45,7 +46,7 @@ require("../../inc/config.php");
 			if ($mop == "01/3" ) {$mop_text = "Cash/Trnf";}
 			if ($mop == "0/3" ) {$mop_text = "Trnf";}
 
-			$output[0]["mop"] = $mop_text;
+			$output[$index]["mop"] = $mop_text;
 
 			//get customer information
 			$cust_id = $row2["cid"];

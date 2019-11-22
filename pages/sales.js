@@ -266,7 +266,7 @@ function full_receipt(){
 	var total_sales = parseFloat($("#total_sale_label").html());
 
 	//means of payment
-	var mop = "";
+	var mop = "0";
 	if (cash_tendered > 0) {mop = mop + "/1"} else {mop}
 	if (pos_tendered > 0) {mop = mop + "/2"} else {mop}
 	if (trnf_tendered > 0) {mop = mop + "/3"} else {mop}
