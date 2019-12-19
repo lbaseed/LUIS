@@ -202,10 +202,11 @@ protectPage(7);
                                                     while($row2 = $stmt2->fetch()){
 
                                                         $item_id = $row2->item_id;
-                                                        $item_name = getTableData("111_items", "item_id", "$item_id", "name");
+                                                        $tbl = $_SESSION["business_id"]."_items";
+                                                        $item_name = getTableData($tbl, "item_id", "$item_id", "name");
                                                         $sold_price = $row2->sold_price;
-                                                        $quantity = $row->qty;
-                                                        $date = $row->date;
+                                                        $quantity = $row2->qty;
+                                                        $date = $row2->date;
                                                         
                                                         echo "<tr><td>$item_name</td><td>$sold_price</td><td>$quantity</td><td>$date</td></tr>";
                                                     }
@@ -265,18 +266,18 @@ protectPage(7);
 
                                         //Used to check if valid trans_id because trans_id is from hidden field and user can alter the value
                                         $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE tid = :trans_id ");
-                                        $stmt->execute(['tans_id' => $trans_id]);
+                                        $stmt->execute(['trans_id' => $trans_id]);
 
                                         $rows = $stmt->rowCount();
 
                                         $stmt1 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :trans_id ");
-                                        $stmt1->execute(['tans_id' => $trans_id]);
+                                        $stmt1->execute(['trans_id' => $trans_id]);
 
                                         $rows1 = $stmt1->rowCount();
 
                                         //Used to check if transaction return already initialized
                                         $stmt2 = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_return WHERE trans_id = :trans_id ");
-                                        $stmt2->execute(['tans_id' => $trans_id]);
+                                        $stmt2->execute(['trans_id' => $trans_id]);
 
                                         $rows2 = $stmt2->rowCount();
 

@@ -231,7 +231,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                     $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_details (`id`, `cust_id`, `amount`, `cash`, `pos`, `transfer`, `payment_type`, `date`) VALUES (:id, :cust_id, :amount, :cash, :pos, :transfer, :payment_type, :date) ");
 					                $insert_payment = $stmt->execute(['id' => "", 'cust_id' => $customer, 'amount' => $total_payment, 'cash' => $amount_cash, 'pos' => $amount_pos, 'transfer' => $amount_trnf, 'payment_type' => $payment_type, 'date' => $today ]);
                                     
-                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."customers SET total_credit= total_credit + :total_payment where ID= :customer");
+                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_customers SET total_credit= total_credit + :total_payment where ID= :customer");
 					                $q = $stmt->execute(['total_payment' => $total_payment, 'customer' => $customer ]);
 
 										if ($q) { message("x","green","Payment Accepted");}
@@ -263,9 +263,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 
                                         if ($rows>0){
                                             
-                                           // $get_rec = mysql_query("select * from ".$_SESSION["business_id"]."_customers where ID='$customer_curr' ");
-                                            
-                                            //if (mysql_num_rows($get_rec)>0){
+                                           
                                             $row = $stmt->fetch();
                                             $t_debt = $row->total_debt;
                                             $t_credit = $row->total_credit;
@@ -535,9 +533,9 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                                     <div class="form-line">
                                                             <input type="text" name="amount_paid_cash" class="form-control" onKeyDown="numericOnly('amount')" required autocomplete="off"  autofocus placeholder="Enter Cash Amount *" />
                                                         </div><div class="form-line">   
-                                                            <input type="text" name="amount_paid_pos" class="form-control" onKeyDown="numericOnly('amount')" required autocomplete="off"  placeholder="Enter POS Amount " />
+                                                            <input type="text" name="amount_paid_pos" class="form-control" onKeyDown="numericOnly('amount')" autocomplete="off"  placeholder="Enter POS Amount " />
                                                         </div><div class="form-line">   
-                                                            <input type="text" name="amount_paid_trnf" class="form-control" onKeyDown="numericOnly('amount')" required autocomplete="off" placeholder="Enter Transfer Amount " />
+                                                            <input type="text" name="amount_paid_trnf" class="form-control" onKeyDown="numericOnly('amount')" autocomplete="off" placeholder="Enter Transfer Amount " />
                                                         
                                                     </div>
                                                 </div>

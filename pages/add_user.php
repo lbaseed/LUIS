@@ -186,7 +186,7 @@ protectPage(9);
                         		<tbody>
 								<?php 
 								
-									$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."users ");
+									$stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_users ");
 									$stmt->execute();
 		
 									$rows = $stmt->rowCount();

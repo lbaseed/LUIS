@@ -1074,8 +1074,8 @@ function getTotalSalesType($type, $date1, $date2){
     $total = 0;
     global $conn;
 
-    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE date BETWEEN :date1 AND :date2 AND status <> 'returned' ");
-    $stmt->execute(['date1' => $date1, 'date2' => $date2]);
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_analysis WHERE date BETWEEN ? AND ? AND status <> 'returned' ");
+    $stmt->execute([$date1, $date2]);
 
     $rows = $stmt->rowCount();
     
@@ -1291,6 +1291,10 @@ function initializeTables($business_id){
             `id` bigint(20) NOT NULL AUTO_INCREMENT,
             `cust_id` bigint(11) NOT NULL,
             `amount` double NOT NULL,
+            `cash` double NOT NULL,
+            `pos` double NOT NULL,
+            `transfer` double NOT NULL,
+            `payment_type` varchar(20) NOT NULL,
             `date` date NOT NULL,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1547,13 +1551,16 @@ function getDailyDeposites($date1, $date2, $type, $payment_class){
     $total_deposites = 0;
 
     if($payment_class){ 
-        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE date between '$date1' and '$date2' and payment_type='$payment_class' ";
+        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE date between :dt1 and :dt2 and payment_type='$payment_class' ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['dt1'=>$date1, 'dt2' => $date2, 'paymentClass'=>$payment_class]);
     }else {
-        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details where date between '$date1' and '$date2' ";
+        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details where date between :dt1 and :dt2 ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['dt1'=>$date1, 'dt2' => $date2]);
     }
 
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
+        
 
         $rows = $stmt->rowCount();
 
@@ -1595,6 +1602,39 @@ function insertReturn($trans_id, $reason){
     }else {
         return false;
     }
+}
+
+function companyHeading($data){
+
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_company_profile ");
+    $stmt->execute();
+
+    $rows = $stmt->rowCount();
+    
+    if ($rows>0)
+    {
+        
+        $row = $stmt->fetch();
+        
+        $company_name = $row->name;
+        $address = $row->address;
+        $phone1 = $row->phone1; 
+        $phone2 = $row->phone2;
+        $email = $row->email;  
+        $logo = $row->logo;
+                                        
+    }
+    ?>
+        <div style="text-align: center"><img src="../images/logos/<?php echo $logo; ?>" width="90" height="80"  /></div>
+                        <div style="text-align: center;">
+                            <label id="bus_name"><?php echo $company_name?></label><br>
+                            <label id="bus_address"><?php echo $address?></label><br>
+                            <label id="bus_contact"><?php echo $phone1 . ", " .$phone2; ?></label><br>
+                            <label id="bus_contact"><?php echo $data; ?></label>
+                        </div>
+    <?php
 }
 
 ?>
