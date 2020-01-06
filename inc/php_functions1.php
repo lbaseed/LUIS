@@ -1,9 +1,9 @@
 <?php 
-     //error_reporting(0);
+    // error_reporting(0);
     ob_start(); 
-    //$_SESSION["home_link"] = "https://luis.aws.com.ng/pages/"; 
+    //$_SESSION["home_link"] = "https://uis.com.ng/pages/"; 
 
-    //$_SESSION["home_link"] = "http://k9isonline.com/luis/pages/"; 
+    //$_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
 
     $_SESSION["home_link"] = "http://localhost/LUIS/pages/"; 
 
@@ -69,12 +69,9 @@ function links($title){
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     
-	<!-- Custom Css -->
-    <link href="../css/custom.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="../css/fonts.css" rel="stylesheet" type="text/css">
     <link href="../css/icons.css" rel="stylesheet" type="text/css">
-
 
     <!-- Bootstrap Core Css -->
     <link href="../plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -91,12 +88,8 @@ function links($title){
     <!-- Custom Css -->
     <link href="../css/style.css" rel="stylesheet">
 
-
     <!-- AdminBSB Themes. You can choose a theme from css/themes instead of get all themes -->
     <link href="../css/themes/all-themes.css" rel="stylesheet" />
-
-	
-
 	<?php
 }
 
@@ -126,7 +119,7 @@ function top_bar(){
             <div class="navbar-header">
                 <a href="javascript:void(0);" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false"></a>
                 <a href="javascript:void(0);" class="bars"></a>
-                <a class="navbar-brand" href="index.php">LUMO Universal Inventory SYSTEM (LUIS)</a>
+                <a class="navbar-brand" href="index.php">LUMOKU Universal Inventory SYSTEM (LUMOKU UIS)</a>
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
@@ -167,7 +160,7 @@ function navigation_left(){
 	$home_link = $_SESSION["home_link"];
 	$bid = $_SESSION["business_id"];
 	
-	$logo = getTableData("{$bid}_company_profile", "id", "1", "logo");
+	$logo = getTableData("$bid_company_profile", "id", "1", "logo");
 		
     include '../pages/navigation.php'; 
             
@@ -1003,7 +996,7 @@ function dailySales(){
         return $sales;
                                         
     }else {
-        return $sales;
+        return "Error Getting Record";
     }
 	
 }
@@ -1028,7 +1021,7 @@ function dailyQty(){
         return $qty;
                                         
     }else {
-        return $qty;
+        return "Error Getting Record";
     }
 	
 }
@@ -1114,15 +1107,13 @@ function getTotalSalesType($type, $date1, $date2){
 }
 
 function initializeTables($business_id){
-    
-     global $conn;
-     
+    global $conn;
     $audit_trail = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_audit_trail` (
             `id` bigint(11) NOT NULL AUTO_INCREMENT,
             `operation` varchar(50) NOT NULL,
             `date` date NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `user` int(11) NOT NULL,
             `activity` text NOT NULL,
             PRIMARY KEY (`id`)
@@ -1160,7 +1151,7 @@ function initializeTables($business_id){
             `balance` double NOT NULL,
             `cid` int(11) NOT NULL,
             `cashier` varchar(200) NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`tid`);
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
@@ -1256,7 +1247,7 @@ function initializeTables($business_id){
             `item` int(11) NOT NULL,
             `serialNumber` varchar(200) NOT NULL,
             `sales_id` bigint(20) NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
@@ -1325,23 +1316,7 @@ function initializeTables($business_id){
     ");
 
     $auto_inc_placed_order = $conn->query("ALTER TABLE `".$business_id."_placed_order` AUTO_INCREMENT=100 ");
-	
-	$payment_details = $conn->query("
-        CREATE TABLE IF NOT EXISTS `".$business_id."_sup_payment_details` (
-            `id` bigint(20) NOT NULL AUTO_INCREMENT,
-            `sup_id` bigint(11) NOT NULL,
-            `amount` double NOT NULL,
-            `cash` double NOT NULL,
-            `pos` double NOT NULL,
-            `transfer` double NOT NULL,
-    		`desc` text NOT NULL,
-            `date` date NOT NULL,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-    ");
 
-    $auto_inc_payment_details = $conn->query("ALTER TABLE `".$business_id."_sup_payment_details` AUTO_INCREMENT=100 ");
-	
     $return = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_return` (
             `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -1381,7 +1356,7 @@ function initializeTables($business_id){
             `qty` double NOT NULL,
             `date` date NOT NULL,
             `user` int(11) NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
@@ -1394,7 +1369,7 @@ function initializeTables($business_id){
             `amount` double NOT NULL,
             `qty` double NOT NULL,
             `date` date NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
@@ -1426,7 +1401,7 @@ function initializeTables($business_id){
             `balance` double NOT NULL,
             `cid` int(11) NOT NULL,
             `cashier` varchar(200) NOT NULL,
-            `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `time_tamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `status` varchar(20) DEFAULT NULL,
             PRIMARY KEY (`tid`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1448,7 +1423,7 @@ function initializeTables($business_id){
             PRIMARY KEY (`username`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
-
+  
     return true;
 }
 
@@ -1457,7 +1432,7 @@ function updateBusinesses($business_id){
     global $conn;
     $date_verified = date("Y-m-d");
 
-    $stmt = $conn->prepare("UPDATE businesses SET active_status = '1', verified_status = '1', date_verified = '$date_verified' WHERE business_id = :business_id ");
+    $stmt = $conn->prepare("UPDATE businesses SET active_status = 'active', verified_status = 'verified', date_verified = '$date_verified' WHERE business_id = :business_id ");
 	$query = $stmt->execute(['business_id' => $business_id]);
 
     if ($query) {
@@ -1576,13 +1551,16 @@ function getDailyDeposites($date1, $date2, $type, $payment_class){
     $total_deposites = 0;
 
     if($payment_class){ 
-        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE date between '$date1' and '$date2' and payment_type='$payment_class' ";
+        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE date between :dt1 and :dt2 and payment_type='$payment_class' ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['dt1'=>$date1, 'dt2' => $date2, 'paymentClass'=>$payment_class]);
     }else {
-        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details where date between '$date1' and '$date2' ";
+        $sql = "SELECT * FROM ".$_SESSION["business_id"]."_payment_details where date between :dt1 and :dt2 ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['dt1'=>$date1, 'dt2' => $date2]);
     }
 
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
+        
 
         $rows = $stmt->rowCount();
 
@@ -1658,6 +1636,5 @@ function companyHeading($data){
                         </div>
     <?php
 }
-
 
 ?>

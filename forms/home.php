@@ -67,11 +67,12 @@
                         <div class="body">
                              <div class="list-group" style="font-weight: 600">
                                <a href="../pages/add_item.php" class="list-group-item">Items  </a>
-                               <a href="../pages/add_stock.php" class="list-group-item">Stock  </a>
+                               <a href="../pages/prepare_stock_order.php" class="list-group-item">Prepare Stock Order</a>
+							   <a href="../pages/sales.php" target="_blank" class="list-group-item">Make Sales  </a>
                                <a href="../pages/add_customer.php" class="list-group-item">Customers  </a>
                                <a href="../pages/eod.php" class="list-group-item">End of Day  </a>
                                <a href="../pages/sales_report.php" class="list-group-item">Sales Report  </a>
-                               <a href="../pages/sales.php" target="_blank" class="list-group-item">Make Sales  </a>
+							   <a href="../pages/logout.php" class="list-group-item">Logout </a>
                             </div>
                              
                         </div>
@@ -87,7 +88,7 @@
                             
                         </div>
                         <div class="body">
-                            Quis pharetra a pharetra fames blandit. Risus faucibus velit Risus imperdiet mattis neque volutpat, etiam lacinia netus dictum magnis per facilisi sociosqu. Volutpat. Ridiculus nostra.
+                            Follow This link to get full User manual on how to operate this system properly.
                         </div>
                     </div>
                 </div>

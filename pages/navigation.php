@@ -71,17 +71,19 @@ switch ($accesslevel) {
                 </a>
             </li>
 
-            <li class='<?php if ($page == 'add_stock.php' || $page == 'prepare_stock_order.php' || $page == 'add_suppliers.php'){echo 'active';} ?>'>
+            <li class='<?php if ($page == 'add_stock.php' || $page == 'prepare_stock_order.php' || $page == 'add_suppliers.php' || $page == 'supplier_account.php'){echo 'active';} ?>'>
                 <a href='javascript:void(0);' class='menu-toggle'>
                     <i class='material-icons'>business_center</i>
                     <span>Stock</span>
                 </a>
                 <ul class='ml-menu'>
-                    <li class='<?php if ($page == 'add_stock.php') {echo 'active';} ?>'>
-                        <a href='<?php echo $home_link; ?>add_stock.php'>
+					<!--
+                    <li class='<?php //if ($page == 'add_stock.php') {echo 'active';} ?>'>
+                        <a href='<?php //echo $home_link; ?>add_stock.php'>
                             <span>Add Stock</span>
                         </a>
                     </li>
+					-->
                     <li class='<?php if ($page == 'prepare_stock_order.php') {echo 'active';} ?>'>
                         <a href='<?php echo $home_link; ?>prepare_stock_order.php'>
                             <span>Prepare Stock Order</span>

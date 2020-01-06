@@ -97,7 +97,7 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
 							if (isset($_POST["submit"])){
 								
 									
-									$item_name = sanitize(strtoupper($_POST["itemName"]));
+									$item_name = sanitize($_POST["itemName"]);
 									$cat = sanitize(strtoupper($_POST["cat"]));
 									$qty = sanitize(strtoupper($_POST["qty"]));
 									

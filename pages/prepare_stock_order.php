@@ -91,10 +91,141 @@ protectPage(6);
             <!-- Input -->
             
           <div class="row clearfix">
-          
+          		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="card">
+                       
+                        
+                        <div class="body">
+                       
+                        	<form action="" method="post">
+
+								<div class="row clearfix">
+									   <div class="col-xs-12">
+										  <div class="form-group">
+											<div class="form-line">
+												 <input type="text" id="barcode" class="form-control" autofocus placeholder="Barcode Here *" />
+											</div>
+										  </div>
+									   </div>
+								   </div>
+								   
+								   <div class="row clearfix">
+														<div class="col-xs-12" id="list">
+															<select class="form-control show-tick" data-live-search="true" name="list" id="fetched_items_list">
+																<option value="">Select Item</option>
+																<?php list_items(); ?>
+															</select>
+														</div>
+									   
+									   
+								   
+									   
+							</div>
+							
+							<input type="hidden" id="item_id" />
+							
+						  <div class="row clearfix">
+									<div class="col-xs-12">
+										  <div class="form-group">
+											
+											<div class="form-line">
+												 <label> Item Name: </label> <label id="item_name_label"></label>
+												  <label id="qty_left_label" class="pull-right"></label> <label class="pull-right"> Item qty left:  </label>
+											</div>
+										  </div>
+									   </div>
+										<div class="col-xs-4">
+										  <div class="form-group">
+											
+											<div class="form-line">
+												 <input type="text" name="sale_price" id="sale_price" onKeyDown="numericOnly('sale_price')" class="form-control" placeholder="sale Price *" />
+												<input type="hidden" id="cost_price" name="cost_price" />
+											</div>
+										  </div>
+									   </div>
+									   <div class="col-xs-4">
+										  <div class="form-group">
+											
+											<div class="form-line">
+												 <input type="text" name="qty" id="qty" onKeyDown="numericOnly('qty')" class="form-control" placeholder="Quantity *" />
+												
+											</div>
+										  </div>
+									   </div>
+									   
+									   <div class="icon-and-text-button-demo">
+									<button class="btn bg-green waves-effect" type="button" name="submit" id="add">
+										<i class="material-icons">add</i> 
+									</button>
+								</div>
+						 </div>
+						  
+								
+								<div class="clearfix">
+										<div class="col-xs-12">
+										  <div class="form-group">
+											
+											<div class="form-line">
+											 Supplier Information
+												 
+												  <select class="form-control show-tick" data-live-search="true" id="fetched_customer_list">
+																<option value="">Select Supplier</option>
+																<?php list_suppliers(); ?>
+													</select>
+												 
+											</div>
+										  </div>
+									   </div>
+								</div>
+								<input type="hidden" name="cid" id="customer_id" />
+								<div class="clearfix"></div>
+								
+										<div class="clearfix">
+										<div class="col-xs-12">
+										  <div class="form-group">
+											
+											<div class="form-line">
+												 <input type="text" readonly name="cu_name" id="cu_name" class="form-control" placeholder="Supplier Name" />
+												
+											</div>
+										  </div>
+									   </div>
+								</div>
+									   <div class="clearfix">
+										<div class="col-xs-12">
+										  <div class="form-group">
+											
+											<div class="form-line">
+												 <input type="text" readonly id="cu_address" class="form-control" placeholder="Supplier Address" />
+												
+											</div>
+										  </div>
+									   </div>
+									 </div>
+								   
+									   <div class="clearfix">  
+										<div class="col-xs-12">
+										  <div class="form-group">
+											
+											<div class="form-line">
+												 <input type="text" readonly id="cu_phone" onKeyDown="numericOnly('cu_phone')" class="form-control" placeholder="Supplier Phone " />
+												
+											</div>
+										  </div>
+									   </div>
+									   </div>
+									   
+								
+									
+						</form>
+                        	
+                        </div>
+                    </div>
+                    
+                </div>
               <!--items sells cart -->
               
-              		<div class="col-lg-6 col-md-6 col-sm-8 col-xs-12">
+              		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="card">
                        
                         <div class="header">
@@ -154,138 +285,7 @@ protectPage(6);
                     
                 </div>
                 
-				<div class="col-lg-6 col-md-6 col-sm-8 col-xs-12">
-                    <div class="card">
-                       
-                        
-                        <div class="body">
-                       
-                        	<form action="" method="post">
-
-								<div class="row clearfix">
-									   <div class="col-sm-12">
-										  <div class="form-group">
-											<div class="form-line">
-												 <input type="text" id="barcode" class="form-control" autofocus placeholder="Barcode Here *" />
-											</div>
-										  </div>
-									   </div>
-								   </div>
-								   
-								   <div class="row clearfix">
-														<div class="col-sm-12" id="list">
-															<select class="form-control show-tick" data-live-search="true" name="list" id="fetched_items_list">
-																<option value="">Select Item</option>
-																<?php list_items(); ?>
-															</select>
-														</div>
-									   
-									   
-								   
-									   
-							</div>
-							
-							<input type="hidden" id="item_id" />
-							
-						  <div class="row clearfix">
-									<div class="col-sm-12">
-										  <div class="form-group">
-											
-											<div class="form-line">
-												 <label> Item Name: </label> <label id="item_name_label"></label>
-												  <label id="qty_left_label" class="pull-right"></label> <label class="pull-right"> Item qty left:  </label>
-											</div>
-										  </div>
-									   </div>
-										<div class="col-sm-4">
-										  <div class="form-group">
-											
-											<div class="form-line">
-												 <input type="text" name="sale_price" id="sale_price" onKeyDown="numericOnly('sale_price')" class="form-control" placeholder="sale Price *" />
-												<input type="hidden" id="cost_price" name="cost_price" />
-											</div>
-										  </div>
-									   </div>
-									   <div class="col-sm-4">
-										  <div class="form-group">
-											
-											<div class="form-line">
-												 <input type="text" name="qty" id="qty" onKeyDown="numericOnly('qty')" class="form-control" placeholder="Quantity *" />
-												
-											</div>
-										  </div>
-									   </div>
-									   
-									   <div class="icon-and-text-button-demo">
-									<button class="btn bg-green waves-effect" type="button" name="submit" id="add">
-										<i class="material-icons">add</i> 
-									</button>
-								</div>
-						 </div>
-						  
-								
-								<div class="clearfix">
-										<div class="col-sm-12">
-										  <div class="form-group">
-											
-											<div class="form-line">
-											 Supplier Information
-												 
-												  <select class="form-control show-tick" data-live-search="true" id="fetched_customer_list">
-																<option value="">Select Supplier</option>
-																<?php list_suppliers(); ?>
-													</select>
-												 
-											</div>
-										  </div>
-									   </div>
-								</div>
-								<input type="hidden" name="cid" id="customer_id" />
-								<div class="clearfix"></div>
-								
-										<div class="clearfix">
-										<div class="col-sm-12">
-										  <div class="form-group">
-											
-											<div class="form-line">
-												 <input type="text" readonly name="cu_name" id="cu_name" class="form-control" placeholder="Supplier Name" />
-												
-											</div>
-										  </div>
-									   </div>
-								</div>
-									   <div class="clearfix">
-										<div class="col-sm-12">
-										  <div class="form-group">
-											
-											<div class="form-line">
-												 <input type="text" readonly id="cu_address" class="form-control" placeholder="Supplier Address" />
-												
-											</div>
-										  </div>
-									   </div>
-									 </div>
-								   
-									   <div class="clearfix">  
-										<div class="col-sm-12">
-										  <div class="form-group">
-											
-											<div class="form-line">
-												 <input type="text" readonly id="cu_phone" onKeyDown="numericOnly('cu_phone')" class="form-control" placeholder="Supplier Phone " />
-												
-											</div>
-										  </div>
-									   </div>
-									   </div>
-									   
-								
-									
-						</form>
-                        	
-                        </div>
-                    </div>
-                    
-                </div>
+				
 				
                 <div class="row clearfix">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -312,7 +312,7 @@ protectPage(6);
                             	<form action="" method="GET">
                         					
                         					 <div class="row clearfix">
-														<div class="col-sm-3">
+														<div class="col-sm-3 col-xs-12">
                                                         <select class="form-control show-tick" name="supplier" data-live-search="true" id="fetched_suppliers">
 																<option value="">-- Select Supplier * --</option>
 																<option value="ALL">All Suppliers</option>
@@ -320,7 +320,7 @@ protectPage(6);
 															</select>
 														</div>
 														
-									<div class="col-md-3">
+									<div class="col-sm-3 col-xs-12">
                                         <div class="input-group">
                                             <span class="input-group-addon">
                                                 <i class="material-icons">date_range</i>
@@ -405,7 +405,7 @@ protectPage(6);
 											
 											//search sales record
 											$supplier = sanitize($_GET["supplier"]);
-                                                $dt = split(":",sanitize($_GET["date"]));
+                                                $dt = explode(":",sanitize($_GET["date"]));
 											
                                                 if ($supplier and $dt){
                                         
@@ -465,7 +465,7 @@ protectPage(6);
                                                     </button> </td> <td>";
 
                                                     if ($status == "NOT_SUPPLIED"){
-                                                    echo "<button id='$ref' type='button' class='btn bg-default waves-effect' onClick='processOrder(".$ref.")'> 
+                                                    echo "<button id='$ref' type='button' class='btn bg-default waves-effect' onClick='processOrder(".$ref.",".$supplierID.")' id='$ref'> 
                                                                                     <i class='material-icons'>assignment</i>Process
                                                     </button>";
                                                     }

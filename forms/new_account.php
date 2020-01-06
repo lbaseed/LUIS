@@ -23,21 +23,19 @@ if(isset($_POST["post"]))
 
 		if (!empty($customer_name) && !empty($business_name) && !empty($business_address) && !empty($phone) && !empty($email))
 		{
-			//check account exist with same email
-			
 			$stmt  = $conn->prepare("INSERT INTO businesses (business_id, business_name, business_address, customer_name, phone, email, date_registered, active_status, verified_status, verification_code, date_verified) VALUES (:business_id, :business_name, :business_address, :customer_name, :phone, :email, :date_registered, :active_status, :verified_status, :verification_code, :date_verified) ");
     		$query = $stmt->execute(['business_id' => "", 'business_name' => $business_name, 'business_address' => $business_address, 'customer_name' => $customer_name, 'phone' => $phone, 'email' => $email, 'date_registered' => $date_registered, 'active_status' => $active_status, 'verified_status' => $verified_status, 'verification_code' => $verification_code, 'date_verified' => ""]);
 
 			if ($query) {
 
 				$from="support@uis.com.ng";
-				$url="https://www.uis.com.ng/forms/activate.php?auth=".str_rot13($email)."&veri=".$verification_code." ";
+				$url="https://luis.aws.com.ng/forms/activate.php?auth=".str_rot13($email)."&veri=".$verification_code." ";
 				$msg="Yor registration is almost complete,\n Kindly follow this link  ".$url." to complete it \n\n".
 				"Link is only valid for 24 hours";
 				$subj="LUIS - New Account";
 
 				notify($msg,$email,$subj,$from);
-					echo "hjgkjk";
+				
 					header("Location: ../pages/message_page.php?signupsuccess");
 				
 

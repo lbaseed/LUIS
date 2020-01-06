@@ -1,21 +1,36 @@
 <?php ob_start(); include("../inc/config.php"); include("../inc/php_functions.php");   
 protectPage(5);
-if($_SESSION["clearance"]==6) {header("Location: index.php");}
 ?>
 <!DOCTYPE html>
 <html>
 
 <head>
-    <?php links("UIS-Debts page") ?>
+    <?php links("UIS-Suppliers Account page") ?>
+	
 
-    <!-- Bootstrap Material Datetime Picker Css -->
-    <link href="../plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet" />
-    
+    <!-- Wait Me Css -->
+    <link href="../plugins/waitme/waitMe.css" rel="stylesheet" />
+
+ 
+    <!-- Bootstrap Select Css -->
+    <link href="../plugins/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />
+
+
+ 
     <!--data tables-->
     <link href="../plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
     
     <!-- Validation Plugin Js -->
     <script src="plugins/jquery-validation/jquery.validate.js"></script>
+	
+	<!-- Bootstrap Select Css -->
+    <link href="../plugins/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />
+	
+	   <!-- Bootstrap Material Datetime Picker Css -->
+    <link href="../plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet" />
+	
+	
+    
 </head>
 
 <body class="theme-green">
@@ -58,13 +73,13 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
             
             <div class="row clearfix">
               
-						<div class="col-lg-6 col-md-6 col-sm-4 col-xs-4">
-                    <div class="card">
+						<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    	<div class="card">
                        
                         <div class="header">
                             <h2>
-                              Customer Debts History
-                                <small>Customer Information</small>
+                              Supplier Account
+								<small>Supplier Information</small>
                             </h2>
                             <ul class="header-dropdown m-r--5">
                                 <li class="dropdown">
@@ -98,7 +113,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 									
 								if ($cust_id and $cust_name and $cust_address and $cust_phone){
                                     
-                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_customers SET full_name= :cust_name, address = :cust_address, phone = :cust_phone WHERE ID = :cust_id ");
+                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_suppliers SET full_name= :cust_name, address = :cust_address, phone = :cust_phone WHERE ID = :cust_id ");
                                     $query = $stmt->execute(['cust_name' => $cust_name, 'cust_address' => $cust_address, 'cust_phone' => $cust_phone, 'ID' => $cust_id]);
 
 									if ($query) { echo "<div class='alert alert-success' role='alert'>Item Updated Successfully</div>"; }
@@ -108,9 +123,9 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 							
 							{
 								//display selected customer's infomration
-								$get_customer_id = $_GET["customer"];
+								$get_customer_id = $_GET["sup"];
                             
-                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers where ID = :get_customer_id ");
+                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers where ID = :get_customer_id ");
                                 $stmt->execute(['get_customer_id' => $get_customer_id]);
 
                                 $rows = $stmt->rowCount();
@@ -128,13 +143,14 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                             
                                     }
 							}
+							
 						?>
                         	<form action="" method="post">
 
 							<input type="hidden" name="cust_id" value="<?php echo $get_customer_id; ?>" />
 								
 								<div class="row clearfix">
-									   <div class="col-sm-12">
+									   <div class="col-xs-12">
 										  <div class="form-group">
 											<div class="form-line">
 												 <input type="text" name="fullname" class="form-control" value="<?php echo $fetch_customer_name?>" required autofocus placeholder="Full Name *" />
@@ -145,7 +161,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 								   </div>
 								   
 								   <div class="row clearfix">
-									   <div class="col-sm-12">
+									   <div class="col-xs-12">
 										  <div class="form-group">
 											<div class="form-line">
 												 <input type="text" name="address" class="form-control" value="<?php echo $fetch_address; ?>" required placeholder="Address *" />
@@ -155,7 +171,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 									  
 								   </div>
 								   <div class="row clearfix">
-									   <div class="col-sm-12">
+									   <div class="col-xs-12">
 										  <div class="form-group">
 											<div class="form-line">
 												 <input type="text" name="pnum" class="form-control" value="<?php echo $fetch_phone; ?>" required placeholder="Phone Number*" />
@@ -182,14 +198,14 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 				
                 
                 
-                <div class="col-lg-6 col-md-6 col-sm-4 col-xs-4">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                 	
                 	<div class="card">
                        
                         <div class="header">
                             <h2>
-                              Customer Debts Payments
-                                <small>Debt payments</small>
+                              Supplier Payments
+                                <small>Payments</small>
                             </h2>
                             <ul class="header-dropdown m-r--5">
                                 <li class="dropdown">
@@ -197,7 +213,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                         <i class="material-icons">more_vert</i>
                                     </a>
                                     <ul class="dropdown-menu pull-right">
-                                        <li><a href="javascript:void(0);" onClick="debtPlatform();" id="addPayment">Add Payment</a></li>
+                                        <li><a href="javascript:void(0);" onClick="paymentPlatform()" id="addPayment">Add Payment</a></li>
                                        
                                     </ul>
                                 </li>
@@ -207,34 +223,31 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                         	
                         	<?php 
 						
+							//post payment done to suppliers
+							
 								if(isset($_POST["post_payment"])){
 									
-									$customer = sanitize($_GET["customer"]);
+									$customer = sanitize($_GET["sup"]);
 									
                                     $amount_cash = sanitize($_POST["amount_paid_cash"]);
                                     $amount_pos = sanitize($_POST["amount_paid_pos"]);
                                     $amount_trnf = sanitize($_POST["amount_paid_trnf"]);
+									$paymen_desc = sanitize($_POST["payment_desc"]);
 
                                     $total_payment = $amount_cash + $amount_pos + $amount_trnf;
 
-                                    $bal = getCustomerBal($customer) + $total_payment;
-                                    $today = date("Y-m-d");
-
-                                    if ($bal>=0){
-                                      $payment_type = "deposite";
-                                    } else {$payment_type = "payback";}
-									
 									if ($total_payment){
 										
                                     //insert payment information
 
-                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_payment_details (`id`, `cust_id`, `amount`, `cash`, `pos`, `transfer`, `payment_type`, `date`) VALUES (:id, :cust_id, :amount, :cash, :pos, :transfer, :payment_type, :date) ");
-					                $insert_payment = $stmt->execute(['id' => "", 'cust_id' => $customer, 'amount' => $total_payment, 'cash' => $amount_cash, 'pos' => $amount_pos, 'transfer' => $amount_trnf, 'payment_type' => $payment_type, 'date' => $today ]);
+                                    $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_sup_payment_details (`id`, `sup_id`, `amount`, `cash`, `pos`, `transfer`, `desc`, `date`) VALUES (:id, :cust_id, :amount, :cash, :pos, :transfer, :payment_type, :date) ");
+										
+					                $insert_payment = $stmt->execute(['id' => "", 'cust_id' => $customer, 'amount' => $total_payment, 'cash' => $amount_cash, 'pos' => $amount_pos, 'transfer' => $amount_trnf, 'payment_type' => $payment_desc, 'date' => $today ]);
                                     
-                                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_customers SET total_credit= total_credit + :total_payment where ID= :customer");
-					                $q = $stmt->execute(['total_payment' => $total_payment, 'customer' => $customer ]);
+                                    $stmt2 = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_suppliers SET total_debt= total_debt + ? where ID=?");
+					                //$q = $stmt2->execute([$total_payment, $customer ]);
 
-										if ($q) { message("x","green","Payment Accepted");}
+										if ($insert_payment) { message("x","green","Payment Accepted");}
 										
 										else {message("x","red","Operation Failed"); }	
 										
@@ -254,9 +267,10 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                        		<tbody>
                       				
                        				<?php
-                                        $customer_curr = $_GET["customer"];
+								
+                                        $customer_curr = $_GET["sup"];
                                         
-                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_customers WHERE  ID= :customer_curr ");
+                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers WHERE  ID= :customer_curr ");
                                         $stmt->execute(['customer_curr' => $customer_curr]);
 
                                         $rows = $stmt->rowCount();
@@ -269,16 +283,17 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                             $t_credit = $row->total_credit;
                                             $rem_credit = $t_credit - $t_debt;
                                             
-                                            echo "<tr> <td>Total Debt</td> <td> ". number_format($t_debt)." </td> </tr>";
-                                            echo "<tr> <td>Total Credit</td> <td> ". number_format($t_credit)."  </td> </tr>";
+                                            echo "<tr> <td>Total Payout</td> <td> ". number_format($t_debt)." </td> </tr>";
+                                            echo "<tr> <td>Total Supply</td> <td> ". number_format($t_credit)."  </td> </tr>";
                                             
-                                            $credit_msg = "Remaining Credit in Account: ";
-                                            $debit_msg = "Final Balance Payable by Customer";
+                                            $credit_msg = "Final Balance Payable to Supplier : ";
+                                            $debit_msg = "Remaining Value with Supplier : ";
                                             
                                             if ($rem_credit > 0){ echo "<tr> <td>$credit_msg </td> <td> ". number_format($rem_credit)."  </td> </tr>"; }
                                             else {echo "<tr> <td>$debit_msg </td> <td> ". number_format($rem_credit)." </td> </tr>";}
                                                 
                                         }
+										
 								?>
                        		</tbody>
                        	</table>
@@ -298,7 +313,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                     <div class="card">
                     	 <div class="header">
                             <h2>
-                               All Payments and Deposites by <?php echo get_customer($_GET["customer"])." [".$_GET["customer"]."]"; ?>
+                               All Payments to supplier <?php echo get_suppliers($_GET["sup"])." [".$_GET["sup"]."]"; ?>
                                 <small>List of Transactions</small>
                             </h2>
                             <ul class="header-dropdown m-r--5">
@@ -319,13 +334,14 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                 <table class="table table-bordered table-striped table-hover dataTable js-exportable">
                                     <thead>
                                         <tr>
-                                            <th>SN</th><th>Ref</th><th>Amount</th> <th>Channel [Cash]</th><th>Channel [POS]</th> <th>Channel [Transfer]</th> <th>Payment Type</th> <th>Date</th><th> </th>
+                                            <th>SN</th><th>Ref</th><th>Amount</th> <th>Channel [Cash]</th><th>Channel [POS]</th> <th>Channel [Transfer]</th> <th>Description</th> <th>Date</th><th> </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                             <?php
                                         
-                                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_payment_details WHERE cust_id = :get_customer_id ORDER BY `date` DESC ");
+											$get_customer_id = sanitize($_GET["sup"]);
+                                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sup_payment_details WHERE sup_id = :get_customer_id ORDER BY `date` DESC ");
                                                 $stmt->execute(['get_customer_id' => $get_customer_id]);
                                             
                                                 $rows = $stmt->rowCount();
@@ -347,6 +363,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                                         $cash = $row->cash; 
                                                         $pos = $row->pos; 
                                                         $transfer = $row->transfer;
+														$desc = $row->desc;
 
                                                         //sum payments
                                                         $total_payment_sum += $total_amount;
@@ -354,9 +371,9 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                                         $total_pos_sum += $pos;
                                                         $total_transfer_sum += $transfer;
 
-                                                        $payment_type_fetch = strtoupper($row->payment_type);
+                                                       // $payment_type_fetch = strtoupper($row->payment_type);
                                                         
-                                                    echo "<tr><td>$sn</td> <td>$fetched_id</td> <td>". number_format($total_amount) ."</td> <td>". number_format($cash)."</td><td>". number_format($pos)."</td> <td>". number_format($transfer)."</td> <td>$payment_type_fetch</td>
+                                                    echo "<tr><td>$sn</td> <td>$fetched_id</td> <td>". number_format($total_amount) ."</td> <td>". number_format($cash)."</td><td>". number_format($pos)."</td> <td>". number_format($transfer)."</td> <td>$desc</td>
                                                      <td>$trans_date</td>
                                                     <td>
                                                         <button type='button' class='btn bg-default waves-effect' onClick='getDepositePaybackTrans(".$fetched_id.")'> 
@@ -368,11 +385,12 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                                 }
                                             
                                             }
+											
                                         ?>
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                      <?php echo "  <th>SN</th><th>Ref</th><th>". number_format($total_payment_sum)."</th> <th>". number_format($total_cash_sum)."</th><th>". number_format($total_pos_sum)."</th> <th>". number_format($total_transfer_sum)."</th> <th>Payment Type</th> <th>Date</th><th> </th> " ; ?>
+                                      <?php echo "  <th>SN</th><th>Ref</th><th>". number_format($total_payment_sum)."</th> <th>". number_format($total_cash_sum)."</th><th>". number_format($total_pos_sum)."</th> <th>". number_format($total_transfer_sum)."</th> <th></th> <th>Date</th><th> </th> " ; ?>
                                         </tr>    
                                     </tfoot>
                                 </table>
@@ -381,14 +399,68 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                     	
                     </div>
             </div>
-
+			
+			
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="card">
+                        <div class="header">
+                            <h2>
+                                Search Report
+                            </h2>
+                            <ul class="header-dropdown m-r--5">
+                                <li class="dropdown">
+                                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                        <i class="material-icons">more_vert</i>
+                                    </a>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li><a href="javascript:void(0);"> </a></li>
+                                       
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+						
+                        <div class="body">
+                            
+                            	<form action="" method="GET">
+                        					
+                        					 <div class="row clearfix">
+														
+														
+									<div class="col-md-3">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <i class="material-icons">date_range</i>
+                                            </span>
+                                            <div class="form-line">
+                                                <input type="text" class="form-control date" name="date" id="reservation" />
+                                            </div>
+                                        </div>
+										<input type="hidden" name="sup" value="<?php echo $_GET["sup"];?>" />
+                                    </div>
+                                    
+                                    
+                                    <div class="icon-and-text-button-demo">
+									<button class="btn bg-cyan waves-effect" style="width: auto" type="submit" name="submit" value="go" >
+										<i class="material-icons">search</i>
+									</button>
+								</div>
+											  </div>
+                       						
+                        			</form>
+                            
+                        </div>
+                    </div>
+                </div>
+           
+			
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     
                     <div class="card">
                     	 <div class="header">
                             <h2>
-                               All Transactions by Customer
-                                <small>List of Transactions</small>
+                               All Orders for Supplier
+                                <small>List of Orders</small>
                             </h2>
                             <ul class="header-dropdown m-r--5">
                                 <li class="dropdown">
@@ -403,75 +475,120 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                         </div>
                       
                         <div class="body table-responsive">
-                                        
-                                        
                                 <table class="table table-bordered table-striped table-hover dataTable js-exportable">
                                     <thead>
                                         <tr>
-                                            <th>SN</th><th>Ref</th><th>Total Sales</th><th>Amount Paid</th> <th>Balance</th><th>Channel</th> <th>Date</th><th> </th>
+                                            <th>SN</th>
+                                            <th>Order ID</th>
+                                            <th>Supplier</th>
+                                            <th>Value Ordered (N)</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th>Order Receipt</th>
+                                            
                                         </tr>
                                     </thead>
+                                    <tfoot>
+                                    	<tr>
+                                        <th>SN</th>
+                                            <th>Order ID</th>
+                                            <th>Supplier</th>
+                                            <th>Value Ordered (N)</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th>Order Receipt</th>
+                                            
+                                        </tr>
+                                    </tfoot>
+                                   
                                     <tbody>
-                                            <?php
-
-                                                $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_trans WHERE cid = :get_customer_id ORDER BY `balance` DESC ");
-                                                $stmt->execute(['get_customer_id' => $get_customer_id]);
-
-                                                $rows = $stmt->rowCount();
                                         
-                                                if ($rows>0){
-                                                        $sn=1;
-                                                        
-                                                        for($i=0; $i<$rows; $i++){
-                                                            $row = $stmt->fetch();
-                                                                
-                                                            $fetched_id = $row->tid; 
-                                                            $total_sale = $row->total_sales;
-                                                            
-                                                            $trans_date = $row->date; 
-                                                            $mop = $row->mop;
-                                                            $amount_tendered = $row->amount_tendered; 
-                                                            $change = $row->change;  
-                                                            $bal = $row->balance;
-                                                            
-                                                            //converting Means of Payment
-                                                            switch($mop){
-                                                                case "0": $mopText = "Loan";	break;
-                                                                case "0/1": $mopText = "Cash";  break;
-                                                                case "0/1/2": $mopText = "Cash/POS"; break;
-                                                                case "0/1/2/3": $mopText = "Cash/POS/Trnf"; break;
-
-                                                                case "0/2": $mopText = "POS"; break;
-                                                                case "0/2/3": $mopText = "POS/Trnf"; break;
-
-                                                                case "01/3": $mopText = "Cash/Trnf"; break;
-                                                                case "0/3": $mopText = "Trnf"; break;
-                                                            }
+                                        <?php
+											
+										if(isset($_GET["submit"])){
+											
+											//search sales record
+											$supplier = sanitize($_GET["sup"]);
+                                                $dt = explode(":",sanitize($_GET["date"]));
+											
+                                                if ($supplier and $dt){
+                                        
+                                    
+                                                    $dt1 = trim($dt[0]);  
+                                                    $dt2 = trim($dt[1]);
+                                                    $grand_total = 0;
+                                                    $total_profit = 0;
 
                                                     
-                                                            
-                                                            echo "<tr><td>$sn</td> <td>$fetched_id</td> <td>". number_format($total_sale) ."</td> <td>". number_format($amount_tendered)."</td> <td>". number_format($bal)."</td> <td>$mopText</td> <td>$trans_date</td>
-                                                            <td>
-                                                                <button type='button' class='btn bg-default waves-effect' onClick='full_receipt($fetched_id, $get_customer_id)'> 
-                                                                                <i class='material-icons'>assignment</i>
-                                                                                </button>
-                                                            </td>
-                                                            </tr>";
-                                                    $sn++;
-                                                }
+
+                                                        $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_placed_order WHERE supplier= :supplier and status= :st AND dateOrdered BETWEEN :dt1 AND :dt2 ORDER BY `dateOrdered` DESC ");
+                                                        $stmt->execute(['supplier' => $supplier, 'st' => 'supplied', 'dt1' => $dt1, 'dt2' => $dt2]);
+
+                                                    $rows = $stmt->rowCount();
                                             
-                                            }
-                                        ?>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>SN</th><th>Ref</th><th>Total Sales</th><th>Amount Paid</th> <th>Balance</th><th>Channel</th> <th>Date</th> <th> </th>
-                                        </tr>    
-                                    </tfoot>
-                                </table>
+                                                    if($rows>0){
+                                                        $sn = 1; 
+
+                                                        for($i=0; $i<$rows; $i++){
+
+                                                            $row = $stmt->fetch();
+                                                            
+                                                            $ref = $row->ref; 
+                                                            $value_ordered = $row->valueOrdered;
+                                                            $supplierID = $row->supplier;
                                 
-                        </div>
-                    	
+                                                            $SupplierName = get_suppliers($supplierID);  
+                                                            
+                                                            $date = $row->dateOrdered;
+                                                            $date_supplied = $row->dateSupplied;
+                                                            $status = $row->status; 
+                                                            
+															if ($status=="supplied") { $grand_total +=$value_ordered;}
+                                                            //summation of total orders
+                                                           
+                                                            
+                                                            echo "<tr>
+                                                            <td>$sn</td>
+                                                            <td> <a href=''>$ref</a> </td>
+                                                            
+                                                            <td>$SupplierName</td>
+                                                    <td>". number_format($value_ordered)."</td>
+                                                    <td><label id='st_$ref'>$status</label></td>";
+
+                                                    if ($status=="SUPPLIED") {echo "<td>$date_supplied</td>";} else { echo "<td>$date</td>";}
+                                                    
+                                                    echo "<td> ";
+                                                    
+													echo "<button type='button' class='btn bg-default waves-effect' onClick='getReceipt(".$ref.")'> 
+                                                    <i class='material-icons'>assignment</i>
+                                                    </button> ";
+													echo "</td></tr>";
+
+													$sn+=1;
+												}
+												echo "<tr>
+                                                <td> </td>
+                                                <td>  </td>
+                                                
+                                                <td align='right'> <b>Total: </td>
+                                                <td> <b>". number_format($grand_total)."</b></td>
+                                                <td> <b> </b></td>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                                
+												</tr>";
+												
+											}else{ echo "<div class='alert alert-danger'>No Record Found</div>";}
+											
+									    }		
+											
+										}
+										
+										?>
+                                    </tbody>
+                                </table>
+                            </div>                    	
                     </div>
             </div>
                 
@@ -511,12 +628,12 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
             <!-- ======  end of small modal ========-->
             
             <!-- full Size Receipt modal-->
-            <?php general_full_receipt(); ?>
+            <?php general_order_receipt();  ?>
             
             
             <!--Debt Payment modal-->
             
-            <div class="modal fade" id="debtModal" tabindex="-1" role="dialog">
+            <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -526,9 +643,11 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                         <div class="modal-body">
                            	<div id="printDebtPaymentReceipt" style="width: 800px; height: auto">
                            	
+								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+								
                                     <form method="post" action="">
                                         <div class="row clearfix">
-                                            <div class="col-sm-12">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                 <div class="form-group">
                                                     <div class="form-line">
                                                             <input type="text" name="amount_paid_cash" class="form-control" onKeyDown="numericOnly('amount')" required autocomplete="off"  autofocus placeholder="Enter Cash Amount *" />
@@ -540,17 +659,24 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                                                     </div>
                                                 </div>
                                             </div>
+											<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+												<div class="form-line">
+                                                            <textarea name="payment_desc" class="form-control" rows="4" required autocomplete="off" placeholder="Enter Payment Description *"></textarea>
+                                                        </div>
+											</div>
                                             
                                         </div>
                                         
                                 
                                         <div class="icon-and-text-button-demo">
-                                            <button class="btn bg-green waves-effect" type="submit" name="post_payment" value="go">
+                                            <button class="btn bg-green waves-effect pull-left" type="submit" name="post_payment" value="go">
                                                 <i class="material-icons">save</i> 
                                             </button>
                                         </div>
                                     </form>
-
+									
+								</div>
+								
                                 <div id="payment_history"></diV>
 
 
@@ -558,7 +684,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
                         </div>
                         <div class="modal-footer">
                            	
-                            <button type="button" class="btn btn-link waves-effect" id="modal_full_close" data-dismiss="modal">CLOSE</button>
+                            <button type="button" class="btn btn-link waves-effect pull-right" id="modal_full_close" data-dismiss="modal">CLOSE</button>
                         </div>
                     </div>
                 </div>
@@ -585,7 +711,9 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
     <!-- Autosize Plugin Js -->
     <script src="../plugins/autosize/autosize.js"></script>
 
-   
+   <!-- bootstrap-daterangepicker -->
+    <script src="../js/moment/moment.min.js"></script>
+    <script src="../js/datepicker/daterangepicker.js"></script>
     
     <!-- Moment Plugin Js -->
     <script src="../plugins/momentjs/moment.js"></script>
@@ -611,15 +739,25 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
     <script src="../js/pages/tables/jquery-datatable.js"></script>
 
    <!--sales report JS-->
-   <script src="sales_report.js"></script>
+   <script src="stock_order.js"></script>
     <!-- Demo Js -->
     <script src="../js/demo.js"></script>
 
     <script>
-        function debtPlatform(){
+        function paymentPlatform(){
 	
-	$('#debtModal').modal('show');
+	$('#paymentModal').modal({ backdrop: 'static' });
+			
+		
 }
+		
+			$(document).ready(function() {
+        $('#reservation').daterangepicker({format: 'YYYY-MM-DD'}, function(start, end, label) {
+          console.log(start.toISOString(), end.toISOString(), label);
+		 
+        });
+      });
     </script>
+	
 </body>
 </html>

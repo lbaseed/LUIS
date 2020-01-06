@@ -3,11 +3,7 @@
     session_start();
 	error_reporting(0);
 
-    $db_host = "localhost";
-	$db_name = "uis";
-	$db_user = "root";
-	$db_pass = "";
-
+   
 
     class Config{
         

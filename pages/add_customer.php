@@ -1,6 +1,5 @@
 <?php ob_start(); include("../inc/config.php"); include("../inc/php_functions.php");   
 protectPage(5);
-if($_SESSION["clearance"]==6) {header("Location: index.php");}
 
 ?>
 <!DOCTYPE html>
@@ -9,7 +8,7 @@ if($_SESSION["clearance"]==6) {header("Location: index.php");}
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>LUMOKU-UIS Add Customer</title>
+    <title>LUMO-UIS Add Customer</title>
     <!-- Favicon-->
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
 

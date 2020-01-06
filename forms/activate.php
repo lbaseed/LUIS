@@ -44,10 +44,10 @@ if(isset($_GET['auth']) and isset($_GET['veri'])){
 			
         updateBusinesses($business_id);
 
-                    $from="no-reply@uis.com.ng";
-					$url="https://www.uis.com.ng/forms/activate.php?auth=".str_rot13($email)."&veri=".$verification_code." ";
+                    $from="support@uis.com.ng";
+					//$url="https://www.uis.com.ng/forms/activate.php?auth=".str_rot13($email)."&veri=".$verification_code." ";
                     $msg="Congratulations!!!\n\n Your registration is complete,\n Kindly use the system appropriately and manage your business.
-                    \n\n Your Business ID is ".$business_id." \n Admin Username is ".$business_id."101 \n Password: 'pass' \n\n Thank You for your patronage.";
+                    \n\n Your Business ID is ".$business_id." \n Admin Username is ".$business_id."101 \n Password: pass \n\n Thank You for your patronage.";
 					$subj="LUIS - New Account";
 						notify($msg,$email,$subj,$from);
 

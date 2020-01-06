@@ -27,8 +27,6 @@ $business_id = $_SESSION["business_id"];
 
 			$stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_order_details (`oid`, `item_id`, `qty`, `price`, `value`, `ref`, `date`) VALUES (:oid,:item_id,:qty,:price,:value,:ref,:date)");
     		$insert_sale = $stmt->execute(['oid' => "", 'item_id' => $item_id, 'qty' => $item_qty, 'price' => $item_price, 'value' => $sub_total, 'ref' => $tid, 'date' => $dt]);
-				
-			//$insert_sale = mysql_query("insert into ".$business_id."_order_details values('','$item_id','$item_qty','$item_price','$sub_total','$tid','$dt')");
 			
 			
 		}
@@ -48,8 +46,8 @@ $business_id = $_SESSION["business_id"];
 			$cust_id = $cu_id;
 			//add to customers debts records
 
-			$stmt = $conn->prepare("UPDATE ".$business_id."_suppliers SET total_credit=total_credit + :total WHERE ID = :cust_id ");
-			$stmt->execute(['total' => $total, 'cust_id'=> $cust_id]);
+			//$stmt = $conn->prepare("UPDATE ".$business_id."_suppliers SET total_credit=total_credit + :total WHERE ID = :cust_id ");
+			//$stmt->execute(['total' => $total, 'cust_id'=> $cust_id]);
 			
 			//$add_debt = mysql_query("update ".$business_id."_suppliers set total_credit=total_credit + $total where ID='$cust_id'");
 			

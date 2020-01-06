@@ -176,13 +176,13 @@ protectPage(6);
                       <table class="table table-bordered table-striped table-hover dataTable js-exportable">
                       	<thead>
                       		<tr>
-                      			<th>SN</th><th>Customer ID</th><th>Full Name</th><th>Address</th><th>Phone</th> <th>Total Supply</th>
+                      			<th>SN</th><th>Customer ID</th><th>Full Name</th><th>Address</th><th>Phone</th> <th>Total Supply</th><th>Total Payouts</th>
                       		</tr>
                       	</thead>
                       	<tbody>
                         <?php
 
-                            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers ORDER BY `total_credit` DESC ");
+                            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_suppliers ORDER BY `total_credit` ASC ");
                             $stmt->execute();
 
                             $rows = $stmt->rowCount();
@@ -200,11 +200,12 @@ protectPage(6);
                                     $fetch_address = $row->address;
                                     $fetch_credit = $row->total_credit;
                                     $fetch_debt = $row->total_debt; 
-                                    $customer_debt = $fetch_credit - $fetch_debt;
+                                    //$customer_debt = $fetch_credit - $fetch_debt;
                                     
-                                    echo "<tr><td>$sn</td> <td><a href=''>$fetched_id</a></td> <td>$fetch_customer_name</td> <td>$fetch_address</td> <td>$fetch_phone</td> <td>
-                                    " .number_format($customer_credit)."
-                                    </td> </tr>";
+                                    echo "<tr><td>$sn</td> <td><a href='supplier_account.php?sup=$fetched_id'>$fetched_id</a></td> <td>$fetch_customer_name</td> <td>$fetch_address</td> <td>$fetch_phone</td> 
+									<td>".number_format($fetch_credit)."</td>
+									<td>".number_format($fetch_debt)."</td>
+									</tr>";
                                     $sn++;
                                 }
                                     
@@ -214,7 +215,7 @@ protectPage(6);
                       	<tfoot>
                         		
                         		<tr>
-                      			<th>SN</th><th>Customer ID</th><th>Full Name</th><th>Address</th><th>Phone</th> <th>Total Supply</th>
+                      			<th>SN</th><th>Customer ID</th><th>Full Name</th><th>Address</th><th>Phone</th> <th>Total Supply</th><th>Total Payouts</th>
                       		</tr>
                       		
                         </tfoot>

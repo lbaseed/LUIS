@@ -304,33 +304,13 @@ function getTransactionReceipt(refID){
 }
 
 
-function processOrder(order_id){
+function processOrder(order_id,sup){
 
 
-	$.ajax({
-		type: 'POST',
-		url: "api/process_order.php",
-		data: {order: order_id},
-		success: function(message){
-			
-			if (message=="failed") {  alert("Processing failed");}else 
-			{
-				$("#"+message).hide();
-				$("#st_"+message).html("SUPPLIED");
-
-				var year = new Date().getFullYear();
-				var month = new Date().getMonth();
-				var day = new Date().getDate();
-				var date = year + "-" + month + "-" + day;
-				$("#dt_"+message).html(date);
-			}
-			
-
-		},
-		error: function(){
-			alert("error");
-		}
-
+	$.get("api/process_order.php?order="+order_id+"&sup="+sup, function(message){
+		
+		$("#"+order_id).hide();
+		$("#st_"+order_id).html("SUPPLIED");
 	});
 }
 

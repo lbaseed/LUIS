@@ -1,62 +1,5 @@
 <?php ob_start(); include("../inc/config.php"); include("../inc/php_functions.php");   //if ($_SESSION["cur_user"]!="") {} else {logout();} 
 
-// @Kolerian Todo
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require 'PHPMailer/src/Exception.php';
-require 'PHPMailer/src/PHPMailer.php';
-require 'PHPMailer/src/SMTP.php';
-$message = "";
-
-if(isset($_POST["email"]))
-{
-    $emailTo = $_POST["email"];
-    $code =  uniqid(true);
-
-    $stmt = $conn->prepare("insert into resetpassword(code, email) values(?,?)");
-    $q = $stmt->execute([$code, $emailTo]);
-    if(!$q){
-        exit('Error');
-    }
-    $mail = new PHPMailer(true);
-
-        try {
-            //Server settings
-            $mail->isSMTP();                                            // Set mailer to use SMTP
-            $mail->Host       = 'smtp.gmail.com';  // Specify main and backup SMTP servers
-            $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
-            $mail->Username   = 's.kole4real@gmail.com';                     // SMTP username
-            $mail->Password   = 'kolerian3';                               // SMTP password
-            $mail->SMTPSecure = 'tls';                                  // Enable TLS encryption, `ssl` also accepted
-            $mail->Port       = 587;                                    // TCP port to connect to
-        
-            //Recipients
-            $mail->setFrom('s.kole4real@gmail.com', 'K9is');
-            $mail->addAddress("$emailTo");     // Add a recipient
-            $mail->addReplyTo('no-reply@k9is.com', 'No-Reply');
-        
-            // Content
-            $url = "http://".$_SERVER['HTTP_HOST'].dirname($_SERVER["PHP_SELF"])."/resetPassword.php?code=$code";
-
-            $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = 'Your password reset Link';
-            $mail->Body    = "<h1>You requested a password reset<h1> 
-                            <p>Click <a href='$url'>this link</a> to do so</p>
-                            ";
-            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-        
-            $mail->send();
-            $message = 'Reset password link has been sent';
-        } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-        }
-        exit();
-
-}
-
-//$stmt = $conn->prepare("select * from ".$_SESSION["business_id"]."_categories");
-						
 
 
 
@@ -76,16 +19,53 @@ if(isset($_POST["email"]))
         </div>
         <div class="card">
             <div class="body">
-               
+               <div class="msg">Enter your Business ID and Email address, we will send you a link to reset your password</div>
+				<?php
+					if(isset($_POST["reset"]))
+							{
+								$emailTo = sanitize($_POST["email"]);
+								$bid = sanitize($_POST["bid"]);
+
+									$stm = $conn->prepare("select * from ".$bid."_users where email=?");
+									$q = $stm->execute([$emailTo]);
+
+									$rows = $stm->rowCount();
+								if($rows>0){
+
+										$rec = $stm->fetch();
+										$username = $rec->username;
+										$password = $rec->password;
+
+												$from="support@uis.com.ng";
+												$msg="Hello!\n\n Your Login credentials are:-
+												\n\n Your Business ID is : <b>".$bid."</b>\n Username is : <b>".$username."</b>\n Password : <b>".$password."</b> \n\n Thank You for your patronage.";
+												$subj="LUIS - New Account";
+
+												notify($msg,$emailTo,$subj,$from);
+
+										echo '<div class="alert alert-success text-center ">Please Check your e-mail for your Login Details</div>';  
+
+								}else{
+
+									echo "<div class='alert alert-danger text-center'>No Record Found</div>";
+								}
+
+							}
+
+				?>
                 <form id="sign_up" method="POST">
-                    <?php 
-                        if(isset($_POST["email"])){
-                                echo '<p class="text-success text-center bg-success">'.$message. ' Check your e-mail</p>';  
-                        }
                     
-                    ?>
-                    <div class="msg">Enter your email address, we will send you a link to reset your password</div>
                     
+                    
+					<div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="material-icons">business</i>
+                        </span>
+                        <div class="form-line">
+                            <input type="text" class="form-control" name="bid" placeholder="Business ID" required>
+                        </div>
+                    </div>
+					
                     <div class="input-group">
                         <span class="input-group-addon">
                             <i class="material-icons">email</i>

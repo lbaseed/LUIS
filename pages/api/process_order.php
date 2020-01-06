@@ -2,22 +2,24 @@
 ob_start(); 
 include '../../inc/config.php';
 
-    $order_id = $_POST["order"];
+    $order_id = $_GET["order"];
+    $sup = $_GET["sup"];
     $bid = $_SESSION["business_id"];
 
    //get items in placed order list
 
-    $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_order_details WHERE ref= :order_id ");
-    $stmt->execute(['order_id' => $order_id]);
+    $stm = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_order_details WHERE ref= :order_id ");
+    $stm->execute(['order_id' => $order_id]);
 
-    //$q1 = mysql_query("select * from ".$bid."_order_details where ref='$order_id' ");
-    $rows = $stmt->rowCount();
-
+    $rows = $stm->rowCount();
+	
     if($rows>0){
 
         $total = 0;
 
-        while($row = $stmt->fetch()){
+        for($i=0; $i<$rows; $i++){
+
+		$row = $stm->fetch();
 
             $item_id = $row->item_id;
             $item_cost_price = $row->price;
@@ -27,28 +29,27 @@ include '../../inc/config.php';
 
             $stmt = $conn->prepare("UPDATE ".$bid."_items SET qty=qty + :item_qty, cost_price=:item_cost_price, date=NOW() WHERE item_id=:item_id ");
             $stmt->execute(['item_qty' => $item_qty, 'item_cost_price'=> $item_cost_price, 'item_id' => $item_id]);
-            
-            //insert to stock
-            //$query = mysql_query("update ".$bid."_items set qty=qty + '$item_qty', cost_price='$item_cost_price', date=NOW() where item_id='$item_id' ");					
-            
+           
             //loggin
-            $stmt  = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_items (`id`, `item`, `qty`, `date`, `user`, `timeStamp`) VALUES(:id,:item,:qty,:date,:user,NOW()) ");
-            $loggin = $stmt->execute(['id' => "", 'item' => $item_id , 'qty' => $item_qty, 'date' => $date , 'user' => $_SESSION["cur_user"] ]);
+            $stmt2 = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_st_items (`id`, `item`, `qty`, `date`, `user`, `timeStamp`) VALUES(:id,:item,:qty,NOW(),:user,NOW()) ");
+            $loggin = $stmt2->execute(['id' => "", 'item' => $item_id , 'qty' => $item_qty , 'user' => $_SESSION["cur_user"] ]);
 
-			//$loggin = mysql_query("insert into ".$bid."_st_items values('','$item_id','$item_qty','$date','".$_SESSION["cur_user"]."',NOW())");
-									
+								
         }
 
         //update placed order table
 
-        $stmt = $conn->prepare("UPDATE ".$bid."_placed_order SET dateSupplied=NOW(), valueSupplied = :total, status='SUPPLIED' WHERE ref=:order_id ");
-        $q2 = $stmt->execute(['total' => $total, 'order_id'=> $order_id ]);
+        $stmt3 = $conn->prepare("UPDATE ".$bid."_placed_order SET dateSupplied=NOW(), valueSupplied = :total, status='SUPPLIED' WHERE ref=:order_id ");
+        $q2 = $stmt3->execute(['total' => $total, 'order_id'=> $order_id ]);
+		
+			$stmt4 = $conn->prepare("UPDATE ".$bid."_suppliers SET total_credit=total_credit + :total WHERE ID = :sup_id ");
+			$stmt4->execute(['total' => $total, 'sup_id'=> $sup]);
             
-        //$q2 = mysql_query("update ".$bid."_placed_order set dateSupplied=NOW(), valueSupplied='$total', status='SUPPLIED' where ref='$order_id' ");
-
+      
         if ($q2) {echo $order_id;} else { echo "failed"; }
    }
 
-    
+
+
 
 ?>
