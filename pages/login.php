@@ -70,7 +70,7 @@ if (logged_in()) {
                         </div>
                         
                         <div class="col-xs-4 pull-right">
-                            <a href="sign-up.php" class="btn btn-block bg-green">SIGN UP</a>
+                            <a href="sign_up.php" class="btn btn-block bg-green">SIGN UP</a>
                         </div>
                     </div>
                     <div class="row m-t-15 m-b--20">

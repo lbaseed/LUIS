@@ -140,19 +140,19 @@ protectPage(9);
 								   </div>
 								   
 								   <div class="row clearfix">
-														<div class="col-sm-12">
-															<select class="form-control show-tick" name="level">
-																<option value="">-- Clearance --</option>
-																<option value="9">Admin</option>
-																<option value="7">Manager</option>
-																<option value="6">Store Manager</option>
-																<option value="5">Sales Manager</option>
-																<option value="4">Store</option>
-																<option value="3">Sales</option>
-																
-															</select>
-														</div>
-									   </div>
+										<div class="col-sm-12">
+											<select class="form-control show-tick" name="level">
+												<option value="">-- Clearance --</option>
+												<option value="9">Admin</option>
+												<option value="7">Manager</option>
+												<option value="6">Store Manager</option>
+												<option value="5">Sales Manager</option>
+												<option value="4">Store</option>
+												<option value="3">Sales</option>
+												
+											</select>
+										</div>
+									</div>
 
 								  
 								<div class="icon-and-text-button-demo">

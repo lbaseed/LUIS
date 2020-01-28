@@ -1,5 +1,6 @@
 <?php ob_start(); include("../inc/config.php"); include("../inc/php_functions.php");  
 protectPage(4);
+checkCategoryExists();
 if($_SESSION["clearance"]==5) {header("Location: index.php");}
 ?>
 <!DOCTYPE html>

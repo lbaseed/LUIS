@@ -28,7 +28,7 @@
                             <i class="material-icons">person</i>
                         </span>
                         <div class="form-line">
-                            <input type="text" class="form-control" name="customer_name" placeholder="Customer Name" required autofocus>
+                            <input type="text" class="form-control" name="customer_name" placeholder="Customer Name" required autofocus autocomplete="off">
                         </div>
                     </div>
                     
@@ -37,7 +37,7 @@
                             <i class="material-icons">person</i>
                         </span>
                         <div class="form-line">
-                            <input type="text" class="form-control" name="business_name" placeholder="Business Name">
+                            <input type="text" class="form-control" name="business_name" placeholder="Business Name" autocomplete="off">
                         </div>
                     </div>
 
@@ -46,7 +46,7 @@
                             <i class="material-icons">person</i>
                         </span>
                         <div class="form-line">
-                            <input type="text" class="form-control" name="business_address" placeholder="Business Address">
+                            <input type="text" class="form-control" name="business_address" placeholder="Business Address" autocomplete="off">
                         </div>
                     </div>
 
@@ -55,7 +55,7 @@
                             <i class="material-icons">email</i>
                         </span>
                         <div class="form-line">
-                            <input type="email" class="form-control" name="email" placeholder="Email Address" required>
+                            <input type="email" class="form-control" name="email" placeholder="Email Address" required autocomplete="off">
                         </div>
                     </div>
                     
@@ -65,7 +65,7 @@
                             <i class="material-icons">phone</i>
                         </span>
                         <div class="form-line">
-                            <input type="text" class="form-control" id="phone" autocomplete="off" onKeyDown="numericOnly('phone')" name="phone" placeholder="Phone Number" required>
+                            <input type="text" class="form-control" id="phone" autocomplete="off" onKeyDown="numericOnly('phone')" name="phone" placeholder="Phone Number" required autocomplete="off">
                         </div>
                     </div>
                     
