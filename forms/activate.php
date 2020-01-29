@@ -42,6 +42,9 @@ if(isset($_GET['auth']) && isset($_GET['veri'])){
                 $clrs = 9;
                 $active_status = "active";
                 $recover_password = "yes";
+
+                //Expiry date for trial license
+                $expiryDate = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s", time()). " + 1 month"));
             
                     
                     $conn->beginTransaction();
@@ -58,6 +61,10 @@ if(isset($_GET['auth']) && isset($_GET['veri'])){
                     $stmt3 = $conn->prepare("INSERT INTO ".$business_id."_company_profile (`id`, `name`, `address`, `phone1`, `phone2`, `email`, `website`, `logo`, `date`) VALUES (:id,:name,:address,:phone1,:phone2,:email,:website,:logo,:date) ");
                     $query3 = $stmt3->execute(['id' => "", 'name' => $name, 'address' => $address, 'phone1' => $phone1, 'phone2' => '', 'email' => $email, 'website' => '', 'logo' => $logo, 'date' => '']);
                     
+                    //Insert Company profile
+                    $stmt4 = $conn->prepare("INSERT INTO `license_mst`(`id`, `businessID`, `expiryDate`) VALUES (:id, :business_id, :expiryDate");
+                    $query4 = $stmt4->execute(['id' => "", 'business_id' => $business_id, 'expiryDate' => $expiryDate]);
+                    
                     if ($query1 && $query2 && $query3) {
 
                         $from="support@uis.com.ng";
@@ -69,7 +76,7 @@ if(isset($_GET['auth']) && isset($_GET['veri'])){
                         $a = 4;
                         $b = 3;
 
-                        if ($a > $b){//notify($msg,$email,$subj,$from)) {
+                        if (notify($msg,$email,$subj,$from)) {
 
                             $conn->commit();
                             header("Location: ../pages/message_page.php?activatesuccess&businessid=$business_id&password=$password");

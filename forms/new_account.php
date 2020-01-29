@@ -37,7 +37,7 @@ if(isset($_POST["post"]))
 				$subj="LUIS - New Account";
 
 
-				if(1==1){//notify($msg,$email,$subj,$from)){
+				if(notify($msg,$email,$subj,$from)){
 					$conn->commit();
 					header("Location: ../pages/message_page.php?signupsuccess");
 				}else {

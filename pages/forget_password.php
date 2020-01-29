@@ -23,30 +23,31 @@
 				<?php
 					if(isset($_POST["reset"]))
 							{
-								$emailTo = sanitize($_POST["email"]);
+								$email = sanitize($_POST["email"]);
 								$bid = sanitize($_POST["bid"]);
 
-									$stm = $conn->prepare("select * from ".$bid."_users where email=?");
-									$q = $stm->execute([$emailTo]);
+									$stmt = $conn->prepare("select * from ".$bid."_users where email= :email");
+									$q = $stmt->execute(['email' => $email]);
 
-									$rows = $stm->rowCount();
+                                    $rows = $stmt->rowCount();
+                                    
 								if($rows>0){
 
-										$rec = $stm->fetch();
+										$rec = $stmt->fetch();
 										$username = $rec->username;
 										$password = $rec->password;
 
-												$from="support@uis.com.ng";
-												$msg="Hello!\n\n Your Login credentials are:-
-												\n\n Your Business ID is : <b>".$bid."</b>\n Username is : <b>".$username."</b>\n Password : <b>".$password."</b> \n\n Thank You for your patronage.";
-												$subj="LUIS - New Account";
+                                        $from="support@uis.com.ng";
+                                        $msg="Hello!\n\n Your Login credentials are:-
+                                        \n\n Your Business ID is : <b>".$bid."</b>\n Username is : <b>".$username."</b>\n Password : <b>".$password."</b> \n\n Thank You for your patronage.";
+                                        $subj="LUIS - Password Detail";
 
-												notify($msg,$emailTo,$subj,$from);
-
-										echo '<div class="alert alert-success text-center ">Please Check your e-mail for your Login Details</div>';  
-
+                                        if (notify($msg,$email,$subj,$from)) {
+										    echo '<div class="alert alert-success text-center ">Please Check your e-mail for your Login Details</div>';  
+                                        }else{
+                                            echo "<div class='alert alert-danger text-center'>Unable to send email, Please try later</div>";
+                                        }
 								}else{
-
 									echo "<div class='alert alert-danger text-center'>No Record Found</div>";
 								}
 

@@ -119,7 +119,8 @@ ob_start(); include("../../inc/config.php"); include("../../inc/php_functions.ph
 
         }else {
             
-            $query = mysql_query("UPDATE transactions_trn SET approvalStatus = 'rejected', approvalDate = '$today' WHERE id = '$id'");
+            $stmt = $conn->prepare("UPDATE transactions_trn SET approvalStatus = 'rejected', approvalDate = '$today' WHERE id = :id ");
+            $query3 = $stmt->execute(['id' => $id ]);
 
             if ($query) {
 
