@@ -20,8 +20,8 @@ include("../inc/config.php"); include("../inc/php_functions.php");
     //$query = $stmt->execute(['active_status' => $active_status, 'verified_status' => $verified_status, 'date_verified' => $date_verified, 'business_id' => $business_id]);
 
 
-$verification_code = "6e9139268b6ae74a0290fc0dc7f5603a";
-echo $url="localhost:81/k9is/luis/forms/activate.php?auth=".str_rot13("iklilmuhammad@gmail.com")."&veri=".$verification_code." ";
+$verification_code = "063456a40db2b4a8159a0e81a691dae2";
+echo $url="localhost:81/k9is/luis/forms/activate.php?auth=".str_rot13("jambandu@gmail.com")."&veri=".$verification_code." ";
 
 
     

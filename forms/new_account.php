@@ -42,15 +42,15 @@ if(isset($_POST["post"]))
 					header("Location: ../pages/message_page.php?signupsuccess");
 				}else {
 					$conn->rollback();
-					header("Location: ../pages/sign-up.php?failedsignup");
+					header("Location: ../pages/sign_up.php?failedsignup");
 				}
 				
 			}else {
-				header("Location: ../pages/sign-up.php?failedsignup");
+				header("Location: ../pages/sign_up.php?failedsignup");
 			}
 			
 		} else {
-			header("Location: ../pages/sign-up.php?emptyfield");
+			header("Location: ../pages/sign_up.php?emptyfield");
 		}
 	}
 }else {

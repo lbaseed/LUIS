@@ -1,7 +1,7 @@
 <?php 
 date_default_timezone_set("Africa/Lagos");
 
-     //error_reporting(0);
+    error_reporting(0);
     ob_start(); 
     //$_SESSION["home_link"] = "https://luis.aws.com.ng/pages/"; 
 
@@ -1239,10 +1239,10 @@ function protectPage($clearance){
 	    exit();
     }
 
-    if($currentPage !== 'subscription.php' && checkSubscription($_SESSION["business_id"]) == false){
-        header('location:subscription.php');
-	    exit();
-    }
+    //if($currentPage !== 'subscription.php' && checkSubscription($_SESSION["business_id"]) == false){
+      //  header('location:subscription.php');
+	    //exit();
+    //}
 
 }
 
