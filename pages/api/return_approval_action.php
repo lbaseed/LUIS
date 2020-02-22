@@ -62,7 +62,8 @@ include("../../inc/php_functions.php");
                             $query4 = $stmt4->execute([$total_price, $transaction_id ]);
                             
                             if ($query && $query1 && $query2 && $query3) {
-
+                               
+                                $conn->commit();
                                 echo "ApprovalSuccess";
                     
                             }else {
@@ -81,7 +82,8 @@ include("../../inc/php_functions.php");
                     throw new Exception();
                 }
 
-                $conn->commit();
+                //Initially it was here but Iklil changed it on 1/18/2020 at 10:21pm
+                //$conn->commit();
 
             } catch (Exception $e) {
 

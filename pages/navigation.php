@@ -1,6 +1,6 @@
 <?php 
 
-//$home_link = $_SESSION["home_link"];
+$home_link = $_SESSION["home_link"];
 $accesslevel = $_SESSION["clearance"];
 $pagename = explode('/', $_SERVER['SCRIPT_NAME']);
 $page = end($pagename);
@@ -195,6 +195,20 @@ switch ($accesslevel) {
                 <a href='<?php echo $home_link; ?>add_user.php'>
                     <i class='material-icons'>forum</i>
                     <span>Users</span>
+                </a>
+            </li>
+
+            <li class='<?php if($page == 'subscription.php'){echo 'active';} ?>'>
+                <a href='<?php echo $home_link; ?>subscription.php'>
+                    <i class='material-icons'>forum</i>
+                    <span>Subscription</span>
+                </a>
+            </li>
+
+            <li class='<?php if($page == 'subscription_approval.php'){echo 'active';} ?>'>
+                <a href='<?php echo $home_link; ?>subscription_approval.php'>
+                    <i class='material-icons'>forum</i>
+                    <span>Subscription Approval</span>
                 </a>
             </li>
 

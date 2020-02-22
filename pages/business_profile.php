@@ -76,16 +76,14 @@ protectPage(7);
                             ///post update information
                             if(isset($_POST["submit"])){
 
-                                $new_address = sanitize($_POST["new_address"]);
-                                $new_phone1 = sanitize($_POST["new_phone1"]);
-                                $new_phone2 = sanitize($_POST["new_phone2"]);
-                                $new_email = sanitize($_POST["new_email"]);
+                                $address = sanitize($_POST["address"]);
+                                $phone1 = sanitize($_POST["phone1"]);
+                                $phone2 = sanitize($_POST["phone2"]);
+                                $email = sanitize($_POST["email"]);
                                 $rec_id_update = sanitize($_POST["rec_id"]);
 
-                                $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_company_profile SET address= :new_address, phone1 = :new_phone1, phone2 = :new_phone2, email = :new_email WHERE id = :rec_id_update ");
-					            $update_query = $stmt->execute(['new_address' => $new_address, 'new_phone1' => $new_phone1, 'new_phone2' => $new_phone2, 'email' => $new_email, 'rec_id_update' => $rec_id_update ]);
-
-                                //$update_query = mysql_query("update ".$_SESSION["business_id"]."_company_profile set address='$new_address', phone1='$new_phone1', phone2='$new_phone2', email='$new_email' where id='$rec_id_update' ");
+                                $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_company_profile SET address = :address, phone1 = :phone1, phone2 = :phone2, email = :email WHERE id = :rec_id_update ");
+					            $update_query = $stmt->execute(['address' => $address, 'phone1' => $phone1, 'phone2' => $phone2, 'email' => $email, 'rec_id_update' => $rec_id_update ]);
 
                                 if ($update_query) { echo "<div class='alert alert-success'>Record Updated Successfully</div>";}
                                 else { echo "<div class='alert alert-danger'>Record Updated Failed, Try again!</div>";}
@@ -177,7 +175,7 @@ protectPage(7);
                             <div class="col-sm-12">
                                 <div class="form-group">
                                 <div class="form-line">
-                                        <input type="text" class="form-control" name="new_address" placeholder="Address" value="<?php echo escape($address); ?>" required />
+                                        <input type="text" class="form-control" name="address" placeholder="Address" value="<?php echo escape($address); ?>" required />
                                 </div>
                                 </div>
                             </div>
@@ -187,7 +185,7 @@ protectPage(7);
                             <div class="col-sm-12">
                                 <div class="form-group">
                                 <div class="form-line">
-                                        <input type="text" class="form-control" onkeydown="numericOnly('phone1');" id="phone1" name="new_phone1" placeholder="Phone Number 1" value="<?php echo escape($phone1); ?>" required />
+                                        <input type="text" class="form-control" onkeydown="numericOnly('phone1');" id="phone1" name="phone1" placeholder="Phone Number 1" value="<?php echo escape($phone1); ?>" required />
                                 </div>
                                 </div>
                             </div>
@@ -196,7 +194,7 @@ protectPage(7);
                             <div class="col-sm-12">
                                 <div class="form-group">
                                 <div class="form-line">
-                                        <input type="text" class="form-control"onkeydown="numericOnly('phone2');" id="phone2" name="new_phone2" placeholder="Phone Number 2" value="<?php echo escape($phone2); ?>" required />
+                                        <input type="text" class="form-control"onkeydown="numericOnly('phone2');" id="phone2" name="phone2" placeholder="Phone Number 2" value="<?php echo escape($phone2); ?>" required />
                                 </div>
                                 </div>
                             </div>
@@ -205,7 +203,7 @@ protectPage(7);
                             <div class="col-sm-12">
                                 <div class="form-group">
                                 <div class="form-line">
-                                        <input type="email" class="form-control" name="new_email" placeholder="email" value="<?php echo escape($email); ?>" required />
+                                        <input type="email" class="form-control" name="email" placeholder="email" value="<?php echo escape($email); ?>" required />
                                 </div>
                                 </div>
                             </div>

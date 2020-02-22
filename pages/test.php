@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 //Study roll back and apply
 ob_start(); 
 include("../inc/config.php"); 
@@ -34,89 +35,34 @@ echo $used;
 
 //echo date("Y-m-d H:i:s", strtotime($used));
 
+=======
+include("../inc/config.php"); include("../inc/php_functions.php");   
+>>>>>>> 24d3b945d4a071e7bb6adb383d5cd4ce7efb16bf
 
-    if (isset($_POST["action"])) {
+//echo substr(md5(time()), 0, 10);
 
-        $transaction_id = $_POST["transaction_id"];
-        $user = $_POST["user"];
-        $today = date("Y-m-d");
-        
-        if ($_POST["action"] == "approve") {
+//date_default_timezone_set("Africa/Lagos");
 
-            $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = :user, approved_date = :today, status = 'approved' WHERE trans_id=:transaction_id ");
-            $query = $stmt->execute(['user' => $user, 'today' => $today, 'transaction_id' => $transaction_id ]);
+//echo "<p>" . date("M d, Y h:i a") . "</p>";
+    $business_id = 1;
 
-            //$query = mysql_query("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = '$user', approved_date = '$today', status = 'approved' WHERE trans_id = '$transaction_id'");
+    //require_once("../inc/initialize_tables.php");
 
-            $stmt = $conn->prepare("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = :transaction_id ");
-            $get_records = $stmt->execute(['transaction_id' => $transaction_id ]);
+    $verification_expiry = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s", time()). " + 1 day"));
+    
+    $date_verified = date("Y-m-d H:i:s");
+    $active_status = "active";
+    $verified_status = "verified";
 
-            //$get_records = mysql_query("SELECT * FROM ".$_SESSION["business_id"]."_sales WHERE trans_id = '$transaction_id'");
-            
-            $rows = $stmt->rowCount();
-
-            if($rows>0){
-
-                for($i=0; $i<$rows; $i++){
-
-                    $row = $stmt->fetch();
-                    
-                    $item_id = $row->item_id; 
-                    $quantity = $row->qty;
-
-                    $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_items SET qty = qty + :quantity WHERE item_id = :item_id ");
-                    $stmt->execute(['quantity' => $quantity, 'item_id' => $item_id ]);
-
-                    //mysql_query("UPDATE ".$_SESSION["business_id"]."_items SET qty = qty + '$quantity' WHERE item_id = '$item_id'");
-
-                }
-            }
-
-            $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_sales SET status = 'returned' WHERE trans_id = :transaction_id ");
-            $query1 = $stmt->execute(['transaction_id' => $transaction_id ]);
-
-            $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_trans SET status = 'returned', total_sales=0 WHERE tid = :transaction_id ");
-            $query2 = $stmt->execute(['transaction_id' => $transaction_id ]);
-
-            $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_payment_analysis SET status = 'returned' WHERE tid = :transaction_id ");
-            $query3 = $stmt->execute(['transaction_id' => $transaction_id ]);
-
-            //$query1 = mysql_query("UPDATE ".$_SESSION["business_id"]."_sales SET status = 'returned' WHERE trans_id = '$transaction_id'");
-            //$query2 = mysql_query("UPDATE ".$_SESSION["business_id"]."_trans SET status = 'returned', total_sales=0 WHERE tid = '$transaction_id'");
-            //$query3 = mysql_query("UPDATE ".$_SESSION["business_id"]."_payment_analysis SET status = 'returned' WHERE tid = '$transaction_id'");
-                                
+    //$stmt = $conn->prepare("UPDATE businesses SET active_status = :active_status, verified_status = :verified_status, date_verified = :date_verified WHERE business_id = :business_id ");
+    //$query = $stmt->execute(['active_status' => $active_status, 'verified_status' => $verified_status, 'date_verified' => $date_verified, 'business_id' => $business_id]);
 
 
-        if ($query && $query1 && $query2 && $query3) {
-
-            echo "ApprovalSuccess";
-
-        }else {
-
-            echo "ApprovalFailure";
-
-        }
-
-    }else {
-
-        $stmt = $conn->prepare("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = :user, approved_date = '$today', status = 'rejected' WHERE trans_id = :transaction_id ");
-        $query = $stmt->execute(['user' => $user, 'transaction_id' => $transaction_id ]);
-
-        //$query = mysql_query("UPDATE ".$_SESSION["business_id"]."_return SET approved_by = '$user', approved_date = '$today', status = 'rejected' WHERE trans_id = '$transaction_id'");
-
-        if ($query) {
-
-            echo "RejectionSuccess";
-
-        }else {
-
-            echo "RejectionFailure";
-
-        }
-    }
+$verification_code = "063456a40db2b4a8159a0e81a691dae2";
+echo $url="localhost:81/k9is/luis/forms/activate.php?auth=".str_rot13("jambandu@gmail.com")."&veri=".$verification_code." ";
 
 
-    }
+    
 
 
 ?>

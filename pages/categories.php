@@ -50,13 +50,20 @@ protectPage(6);
             <div class="row clearfix">
               
                 
-						<div class="col-lg-6 col-md-6 col-sm-8 col-xs-12">
+                <div class="col-lg-6 col-md-6 col-sm-8 col-xs-12">
                     <div class="card">
                        
+                        <?php
+                            if (isset($_GET["error"])) {
+                                if ($_GET["error"] === "nocategory") {
+                                    echo "<div class='alert alert-danger' role='alert'>You Must Add Category Before Adding Item</div>";
+                                }
+                            } 
+                        ?>
+
                         <div class="header">
                             <h2>
                                Items Categories
-                               
                             </h2>
                             <ul class="header-dropdown m-r--5">
                                 <li class="dropdown">
@@ -76,10 +83,7 @@ protectPage(6);
 							
 							if (isset($_POST["submit"])){
 								
-									
-									$cat_name = sanitize(strtoupper($_POST["parent_name"]));
-									
-									
+                                $cat_name = sanitize(strtoupper($_POST["cat_name"]));
 									
 								if ($cat_name){
 
@@ -94,17 +98,15 @@ protectPage(6);
                         	<form action="" method="post">
 
 								<div class="row clearfix">
-									   <div class="col-sm-12">
-										  <div class="form-group">
-											<div class="form-line">
-												 <input type="text" name="parent_name" class="form-control" placeholder="Category Name " />
-											</div>
-										  </div>
-									   </div>
-								   </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                    <input type="text" name="cat_name" class="form-control" placeholder="Category Name " />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 								   
-									
-						   
 								<div class="icon-button-demo">
 									<button class="btn bg-green waves-effect" type="submit" name="submit">
 										<i class="material-icons">save</i> 

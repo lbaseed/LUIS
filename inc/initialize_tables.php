@@ -1,14 +1,4 @@
 <?php
-include "config.php";
-
-    $business_id = 100;	
-	$name = "Demo Account";
-	$username = $business_id;
-	$password = "admin";
-	$user_lvl = 9;
-	$img = $business_id.".jpg";
-	$status = 1;
-    $last_login = date("Y-m-d H:i:s");
 
     $audit_trail = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_audit_trail` (
@@ -40,11 +30,11 @@ include "config.php";
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
     
-    $auto_increment_borrow = $conn->query("ALTER TABLE `".$business_id."_borrow` AUTO_INCREMENT=100");
+    $auto_inc_borrow = $conn->query("ALTER TABLE `".$business_id."_borrow` AUTO_INCREMENT=100");
 	
 	$borrow_trans = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_borrow_trans` (
-            `tid` bigint(20) NOT NULL,
+            `tid` bigint(20) NOT NULL AUTO_INCREMENT,
             `total_sales` double NOT NULL,
             `date` date NOT NULL,
             `mop` varchar(11) NOT NULL,
@@ -54,15 +44,15 @@ include "config.php";
             `cid` int(11) NOT NULL,
             `cashier` varchar(200) NOT NULL,
             `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`tid`);
+            PRIMARY KEY (`tid`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
     
     $business_profile = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_business_profile` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
-            `startDate` date NOT NULL,
-            `endDate` date NOT NULL,
+            `startDate` datetime NOT NULL,
+            `endDate` datetime NOT NULL,
             `capital` double NOT NULL,
             `turnover` double NOT NULL,
             `profit` double NOT NULL,
@@ -154,7 +144,7 @@ include "config.php";
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
 
-    $auto_inc_items_serial = $conn->query("ALTER TABLE `".$business_id."_items_serial` AUTO_INCREMENT=100 ");
+    $auto_inc_items_serials = $conn->query("ALTER TABLE `".$business_id."_items_serials` AUTO_INCREMENT=100 ");
 
     $order_details = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_order_details` (
@@ -272,7 +262,7 @@ include "config.php";
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
 
-    $auto_incerement_st_sales = $conn->query("ALTER TABLE `".$business_id."_st_sales` AUTO_INCREMENT=100 ");
+    $auto_inc_st_sales = $conn->query("ALTER TABLE `".$business_id."_st_sales` AUTO_INCREMENT=100 ");
 
     $suppliers = $conn->query("
         CREATE TABLE IF NOT EXISTS `".$business_id."_suppliers` (
@@ -322,32 +312,4 @@ include "config.php";
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     ");
 
-    $businesses = $conn->query("
-        CREATE TABLE `businesses` (
-            `business_id` bigint(20) NOT NULL AUTO_INCREMENT,
-            `business_name` varchar(200) NOT NULL,
-            `business_address` varchar(200) NOT NULL,
-            `customer_name` varchar(100) NOT NULL,
-            `phone` varchar(15) NOT NULL,
-            `email` varchar(200) NOT NULL,
-            `date_registered` date NOT NULL,
-            `active_status` varchar(15) NOT NULL DEFAULT '0',
-            `verified_status` varchar(15) NOT NULL,
-            `verification_code` varchar(64) NOT NULL,
-            `date_verified` date NOT NULL,
-            PRIMARY KEY (`business_id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-    ");
-
-    $query = $conn->query("INSERT INTO ".$business_id."_users (username, fullname, phone, email, address, password, active_status, recover_password, clrs, security_question, security_answer) VALUES('','$name','','','','$password','$status','','$user_lvl','','') ");
-
-    $address = "demo location";
-    $phone = "080x xxx xxxx";
-    
-	$query2 = $conn->query("INSERT INTO ".$business_id."_company_profile (id, name, address, phone1, phone2, email, website, logo, date) VALUES ('','$name','$address','$phone','$phone','','','$img','') ");
-    
-    echo "done";
-
-	
-    
 ?>

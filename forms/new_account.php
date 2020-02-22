@@ -15,16 +15,18 @@ if(isset($_POST["post"]))
 	
 	$active_status = 'notactive';
 	$verified_status = 'notverified';
-	$date_registered = date("Y-m-d");
+	$date_registered = date("Y-m-d H:i:s");
+	$verification_expiry = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s", time()). " + 1 day"));
 	$verification_code = md5(hash("whirlpool", $customer_name.$business_name + microtime()));
 	
 	if(!empty($agree))
 	{
+		$conn->beginTransaction();
 
 		if (!empty($customer_name) && !empty($business_name) && !empty($business_address) && !empty($phone) && !empty($email))
 		{
-			$stmt  = $conn->prepare("INSERT INTO businesses (business_id, business_name, business_address, customer_name, phone, email, date_registered, active_status, verified_status, verification_code, date_verified) VALUES (:business_id, :business_name, :business_address, :customer_name, :phone, :email, :date_registered, :active_status, :verified_status, :verification_code, :date_verified) ");
-    		$query = $stmt->execute(['business_id' => "", 'business_name' => $business_name, 'business_address' => $business_address, 'customer_name' => $customer_name, 'phone' => $phone, 'email' => $email, 'date_registered' => $date_registered, 'active_status' => $active_status, 'verified_status' => $verified_status, 'verification_code' => $verification_code, 'date_verified' => ""]);
+			$stmt  = $conn->prepare("INSERT INTO businesses (business_id, business_name, business_address, customer_name, phone, email, date_registered, active_status, verified_status, verification_code, verification_expiry, date_verified) VALUES (:business_id, :business_name, :business_address, :customer_name, :phone, :email, :date_registered, :active_status, :verified_status, :verification_code, :verification_expiry, :date_verified) ");
+    		$query = $stmt->execute(['business_id' => "", 'business_name' => $business_name, 'business_address' => $business_address, 'customer_name' => $customer_name, 'phone' => $phone, 'email' => $email, 'date_registered' => $date_registered, 'active_status' => $active_status, 'verified_status' => $verified_status, 'verification_code' => $verification_code, 'verification_expiry' => $verification_expiry, 'date_verified' => ""]);
 
 			if ($query) {
 
@@ -34,17 +36,21 @@ if(isset($_POST["post"]))
 				"Link is only valid for 24 hours";
 				$subj="LUIS - New Account";
 
-				notify($msg,$email,$subj,$from);
-				
-					header("Location: ../pages/message_page.php?signupsuccess");
-				
 
+				if(notify($msg,$email,$subj,$from)){
+					$conn->commit();
+					header("Location: ../pages/message_page.php?signupsuccess");
+				}else {
+					$conn->rollback();
+					header("Location: ../pages/sign_up.php?failedsignup");
+				}
+				
 			}else {
-				header("Location: ../pages/sign-up.php?failedsignup");
+				header("Location: ../pages/sign_up.php?failedsignup");
 			}
 			
 		} else {
-			header("Location: ../pages/sign-up.php?emptyfield");
+			header("Location: ../pages/sign_up.php?emptyfield");
 		}
 	}
 }else {
