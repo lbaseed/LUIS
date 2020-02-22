@@ -9,6 +9,7 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
     <?php links("UIS-Add Items")?>
 
     <!-- Bootstrap Material Datetime Picker Css -->
+    <link href="../css/custom.min.css" rel="stylesheet">
     <link href="../plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet" />
     
     <!--data tables-->
@@ -104,6 +105,12 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
 									$cost_price = sanitize(strtoupper($_POST["cost_price"]));
                                     $sale_price = sanitize(strtoupper($_POST["sale_price"]));
                                     
+                                    //expiry date procesing
+                                    $exp_date = trim(sanitize(strtoupper($_POST["exp_date"])));
+                                    $splt = explode(":",$exp_date);
+                                    $life_span_from = $splt[0];
+                                    $life_span_to = $splt[1];
+
                                     if ($sale_price > $cost_price) {
                                         
                                         $item_code = sanitize(strtoupper($_POST["itemCode"]));
@@ -114,8 +121,8 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
                                         
                                         if ($item_name and $cat and $cost_price and $sale_price){
 
-                                            $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_items (`item_id`, `name`, `qty`, `cost_price`, `sale_price`, `cat_id`, `med_id`, `date`, `status`, `barcode`) VALUES (:item_id, :name, :qty, :cost_price, :sale_price, :cat_id, :med_id, :date, :status, :barcode) ");
-                                            $query = $stmt->execute(['item_id' => "", 'name' => $item_name, 'qty' => $qty, 'cost_price' => $cost_price, 'sale_price' => $sale_price, 'cat_id' => $cat, 'med_id' => "", 'date' => $date, 'status' => 1, 'barcode' => $item_code ]);
+                                            $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_items (`item_id`, `name`, `qty`, `cost_price`, `sale_price`, `cat_id`, `med_id`, `date`, `status`, `barcode`,`life_span_from`,`life_span_end`) VALUES (:item_id, :name, :qty, :cost_price, :sale_price, :cat_id, :med_id, :date, :status, :barcode, :lsf, :lst) ");
+                                            $query = $stmt->execute(['item_id' => "", 'name' => $item_name, 'qty' => $qty, 'cost_price' => $cost_price, 'sale_price' => $sale_price, 'cat_id' => $cat, 'med_id' => "", 'date' => $date, 'status' => 1, 'barcode' => $item_code, 'lsf' => $life_span_from, 'lst' => $life_span_to ]);
 				
                                             if ($query) { 
                                                 echo "<div class='alert alert-success' role='alert'>Item Added Successfully</div>"; 
@@ -182,7 +189,17 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
 									   <div class="col-sm-3">
 										  <div class="form-group">
 											<div class="form-line">
-												 <input type="text" name="qty" class="form-control" placeholder="quantity *" autocomplete="off">
+												 <input type="text" name="qty" id="qty" class="form-control" onKeyDown="numericOnly('qty')" placeholder="quantity *" autocomplete="off">
+											</div>
+										  </div>
+									   </div>
+
+                                       <div class="col-sm-3">
+										  <div class="form-group">
+											
+											<div class="form-line">
+												 <input type="text" name="exp_date" id="reservation" class="form-control" placeholder="Expiry Date" autocomplete="off">
+												
 											</div>
 										  </div>
 									   </div>
@@ -297,6 +314,10 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
     <!-- Bootstrap Core Js -->
     <script src="../plugins/bootstrap/js/bootstrap.js"></script>
 
+
+    <script src="../js/moment/moment.min.js"></script>
+    <script src="../js/datepicker/daterangepicker.js"></script>
+
     <!-- Select Plugin Js -->
     <script src="../plugins/bootstrap-select/js/bootstrap-select.js"></script>
 
@@ -336,5 +357,24 @@ if($_SESSION["clearance"]==5) {header("Location: index.php");}
 
     <!-- Demo Js -->
     <script src="../js/demo.js"></script>
+    <script>
+
+        $(document).ready(function() {
+        $('#reservation').daterangepicker({format: 'YYYY-MM-DD'}, function(start, end, label) {
+          console.log(start.toISOString(), end.toISOString(), label);
+		 
+        });
+      });
+
+        function numericOnly(fieldID){
+
+        $('#'+ fieldID +'').keypress(function (event) {
+        var keycode = event.which;
+        if (!(event.shiftKey == false && (keycode == 46 || keycode == 8 || keycode == 37 || keycode == 39 || (keycode >= 48 && keycode <= 57)))) {
+            event.preventDefault();
+        }
+        });
+        } 
+    </script>
 </body>
 </html>

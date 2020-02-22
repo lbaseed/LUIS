@@ -1,8 +1,39 @@
 <?php
 //Study roll back and apply
 ob_start(); 
-include("../../inc/config.php"); 
-include("../../inc/php_functions.php");   
+include("../inc/config.php"); 
+include("../inc/php_functions.php");   
+
+//echo date("Y-m-d H:i:s ", "1577964063");
+
+//2days sub
+	$subDate = "2020-01-06 10:52:39";
+	$expDate = "2020-01-08 10:52:39";  
+
+//2month sub
+	$now = "2020-01-06 11:00:57";
+	$expDateMonth = "2020-03-06 11:00:57";
+
+//validity
+	
+	$str_daily_sub = strtotime($now);
+	$str_daily_exp = strtotime($expDate);
+
+	if($str_daily_exp >= $str_daily_sub){
+		//prev sub has some validity;
+		$prev_sub_validity = $str_daily_exp - $str_daily_sub;
+		
+		$str =  $prev_sub_validity + strtotime($expDateMonth);
+	
+		//echo date("Y-m-d H:i:s" ,$str);
+	}
+
+//echo date("Y-m-d H:i:s", strtotime($now));
+$used = strtotime($expDateMonth) - strtotime($now);
+echo $used;
+
+//echo date("Y-m-d H:i:s", strtotime($used));
+
 
     if (isset($_POST["action"])) {
 

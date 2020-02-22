@@ -682,7 +682,7 @@ function numericOnly(fieldID){
         event.preventDefault();
     }
 });
-}
+} 
 
 //sum total tendered
 $("#cash_tendered").keyup(function() {

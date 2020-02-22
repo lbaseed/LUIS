@@ -39,8 +39,8 @@ if(isset($_GET['auth']) and isset($_GET['veri'])){
         $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_users (username, fullname, phone, email, address, password, active_status, recover_password, clrs, security_question, security_answer) VALUES (:username, :fullname, :phone, :email, :address, :password, :active_status, :recover_password, :clrs, :security_question, :security_answer) ");
 		$query = $stmt->execute(['username' => $username, 'fullname' => $fullName, 'phone' => $phone, 'email' => "", 'address' => $address, 'password' => $password, 'active_status' => $active_status, 'recover_password' => $recover_status, 'clrs' => 9, 'security_question' => "", 'security_answer' => "" ]);
             
-        $stmt = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_company_profile (id, name, address, phone1, phone2, email, website, logo, date) VALUES (:id, :name, :address, :phone1, :phone2, :email, :website, :logo, :date) ");
-		$query2 = $stmt->execute(['id' => "", 'name' => $business_name, 'address' => $business_address, 'phone1' => $customer_phone, 'phone2' => "", 'email' => $customer_email, 'website' => "", 'logo' => $logo, 'date' => $dt ]);
+        $stmt2 = $conn->prepare("INSERT INTO ".$_SESSION["business_id"]."_company_profile (id, name, address, phone1, phone2, email, website, logo, date) VALUES (:id, :name, :address, :phone1, :phone2, :email, :website, :logo, :date) ");
+		$query2 = $stmt2->execute(['id' => "", 'name' => $business_name, 'address' => $business_address, 'phone1' => $customer_phone, 'phone2' => "", 'email' => $customer_email, 'website' => "", 'logo' => $logo, 'date' => $dt ]);
 			
         updateBusinesses($business_id);
 
